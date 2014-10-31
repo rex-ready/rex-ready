@@ -129,6 +129,7 @@ package se.sics.tac.aw;
 import se.sics.tac.util.ArgEnumerator;
 import java.util.logging.*;
 
+@SuppressWarnings("all")
 public class DummyAgent extends AgentImpl {
 
   private static final Logger log =

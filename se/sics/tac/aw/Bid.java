@@ -26,6 +26,7 @@
 package se.sics.tac.aw;
 import java.util.StringTokenizer;
 
+@SuppressWarnings("all")
 public class Bid {
 
   public final static String EMPTY_BID_STRING = "()";

@@ -33,6 +33,7 @@
 package se.sics.tac.aw;
 import java.util.ArrayList;
 
+@SuppressWarnings("all")
 public class TimeDispatcher extends Thread {
 
   private static TimeDispatcher dispatcher;

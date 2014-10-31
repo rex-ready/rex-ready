@@ -41,6 +41,7 @@ import javax.swing.table.AbstractTableModel;
 import se.sics.tac.util.ArgEnumerator;
 import se.sics.tac.util.LogFormatter;
 
+@SuppressWarnings("all")
 public class TACAgent implements Task, TACMessageReceiver {
 
   private final static String EOL = System.getProperty("line.separator",

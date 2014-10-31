@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@SuppressWarnings("all")
 public class TACMessage {
 
   private static final Logger log =

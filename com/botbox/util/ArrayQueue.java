@@ -33,6 +33,7 @@ package com.botbox.util;
  * @author  Sverker Janson  (sverker.janson@botbox.com)
  * @version $Revision: 1.5 $, $Date: 2005/06/07 18:58:45 $
  */
+@SuppressWarnings("all")
 public class ArrayQueue implements Cloneable, java.io.Serializable {
 
   private static final long serialVersionUID = 5791745982858131414L;

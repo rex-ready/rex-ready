@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.text.SimpleDateFormat;
 
+@SuppressWarnings("all")
 public class LogFormatter extends Formatter {
 
   final static String EOL = System.getProperty("line.separator", "\r\n");

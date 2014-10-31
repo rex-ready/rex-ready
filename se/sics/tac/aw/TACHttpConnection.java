@@ -34,6 +34,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.logging.*;
 
+@SuppressWarnings("all")
 public class TACHttpConnection extends TACConnection implements Runnable {
 
   private static final Logger log =
