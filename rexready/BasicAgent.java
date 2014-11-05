@@ -12,22 +12,13 @@ public class BasicAgent extends AgentImpl {
     
     @Override
     protected void init(ArgEnumerator args) {
-	for(int i=0; i<8; i++) {
-	    int arrivalPreference = agent.getClientPreference(i, TACAgent.ARRIVAL);
-	    int departurePreference = agent.getClientPreference(i, TACAgent.DEPARTURE);
-	    int hotelValue = agent.getClientPreference(i, TACAgent.HOTEL_VALUE);
-	    int e1Value = agent.getClientPreference(i, TACAgent.E1);
-	    int e2Value = agent.getClientPreference(i, TACAgent.E2);
-	    int e3Value = agent.getClientPreference(i, TACAgent.E3);
-	    
-	    clients[i] = new Client(arrivalPreference, departurePreference, hotelValue, e1Value, e2Value, e3Value);
-	}
+	
     }
 
     @Override
     public void gameStarted() {
-	setAuctionAllocations();
-	bid();
+		setAuctionAllocations();
+		bid();
     }
 
     @Override
@@ -42,41 +33,48 @@ public class BasicAgent extends AgentImpl {
      * Allocate how many of flights, hotels and entertainment tickets will be bid on in each auction.
      */
     private void setAuctionAllocations() {
-	for(int i=0; i<8; i++) {
-	    Client c = clients[i];
-	    Preferences preferences = c.getPreferences();
-	    
-	    //Allocate flight ticket bids.
-	    int[] flightDates = pickFlightDates(preferences);
-	    // Obtain the auction ID for the flight tickets on the preferred day.
-	    int auction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_INFLIGHT, flightDates[0]);
-	    // Increment the number of tickets required from that auction.
-	    agent.setAllocation(auction, agent.getAllocation(auction) + 1);
-	    auction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_OUTFLIGHT, flightDates[1]);
-	    agent.setAllocation(auction, agent.getAllocation(auction) + 1);
-	    
-	    //Allocate hotel room bids.
-	    for (int j = flightDates[0]; j < flightDates[1]; j++) {
-		int hotelType = inTampaTowers(preferences) ? TACAgent.TYPE_GOOD_HOTEL : TACAgent.TYPE_CHEAP_HOTEL;
-		auction = agent.getAuctionFor(TACAgent.CAT_HOTEL, hotelType, j);
-		agent.setAllocation(auction, agent.getAllocation(auction) + 1);
-	    }
-	    
-	    //Allocate entertainment ticket bids.
-	    
-	}
+		for(int i=0; i<8; i++) {
+		    int arrivalPreference = agent.getClientPreference(i, TACAgent.ARRIVAL);
+		    int departurePreference = agent.getClientPreference(i, TACAgent.DEPARTURE);
+		    int hotelValue = agent.getClientPreference(i, TACAgent.HOTEL_VALUE);
+		    int e1Value = agent.getClientPreference(i, TACAgent.E1);
+		    int e2Value = agent.getClientPreference(i, TACAgent.E2);
+		    int e3Value = agent.getClientPreference(i, TACAgent.E3);
+		    clients[i] = new Client(arrivalPreference, departurePreference, hotelValue, e1Value, e2Value, e3Value);
+		    Client c = clients[i];
+		    Preferences preferences = c.getPreferences();
+		    
+		    //Allocate flight ticket bids.
+		    int[] flightDates = pickFlightDates(preferences);
+		    // Obtain the auction ID for the flight tickets on the preferred day.
+		    int auction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_INFLIGHT, flightDates[0]);
+		    // Increment the number of tickets required from that auction.
+		    agent.setAllocation(auction, agent.getAllocation(auction) + 1);
+		    auction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_OUTFLIGHT, flightDates[1]);
+		    agent.setAllocation(auction, agent.getAllocation(auction) + 1);
+		    
+		    //Allocate hotel room bids.
+		    for (int j = flightDates[0]; j < flightDates[1]; j++) {
+			int hotelType = inTampaTowers(preferences) ? TACAgent.TYPE_GOOD_HOTEL : TACAgent.TYPE_CHEAP_HOTEL;
+			auction = agent.getAuctionFor(TACAgent.CAT_HOTEL, hotelType, j);
+			agent.setAllocation(auction, agent.getAllocation(auction) + 1);
+		    }
+		    
+		    //Allocate entertainment ticket bids.
+		    
+		}
     }
     
     private int calculateFlightBidValue() {
-	return 1000;
+		return 1000;
     }
     
     private int calculateHotelBidValue() {
-	return 200;
+		return 200;
     }
     
     private int calculateEntertainmentBidValue() {
-	return 0;
+		return 0;
     }
     
     private void bid() {
