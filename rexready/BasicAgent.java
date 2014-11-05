@@ -12,11 +12,12 @@ public class BasicAgent extends AgentImpl {
     
     @Override
     protected void init(ArgEnumerator args) {
-	
+    	System.out.println("Agent start");
     }
 
     @Override
     public void gameStarted() {
+    	System.out.println("Game start");
 		setAuctionAllocations();
 		bid();
     }
@@ -33,14 +34,17 @@ public class BasicAgent extends AgentImpl {
      * Allocate how many of flights, hotels and entertainment tickets will be bid on in each auction.
      */
     private void setAuctionAllocations() {
+    	System.out.println("Client | Arrival Day | Departure Day | Hotel Value | Ent 1 | Ent 2 | Ent 3 \n");
 		for(int i=0; i<8; i++) {
 		    int arrivalPreference = agent.getClientPreference(i, TACAgent.ARRIVAL);
 		    int departurePreference = agent.getClientPreference(i, TACAgent.DEPARTURE);
 		    int hotelValue = agent.getClientPreference(i, TACAgent.HOTEL_VALUE);
-		    int e1Value = agent.getClientPreference(i, TACAgent.E1);
-		    int e2Value = agent.getClientPreference(i, TACAgent.E2);
-		    int e3Value = agent.getClientPreference(i, TACAgent.E3);
-		    clients[i] = new Client(arrivalPreference, departurePreference, hotelValue, e1Value, e2Value, e3Value);
+		    int[] eValues = new int[3];
+		    eValues[0] = agent.getClientPreference(i, TACAgent.E1);
+		    eValues[1] = agent.getClientPreference(i, TACAgent.E2);
+		    eValues[2] = agent.getClientPreference(i, TACAgent.E3);
+		    System.out.format("%6d | %11d | %13d | %11d | %5d | %5d | %5d\n", i, arrivalPreference, departurePreference, hotelValue, eValues[0], eValues[1], eValues[2]);
+		    clients[i] = new Client(arrivalPreference, departurePreference, hotelValue, eValues[0], eValues[1], eValues[2]);
 		    Client c = clients[i];
 		    Preferences preferences = c.getPreferences();
 		    
@@ -61,9 +65,27 @@ public class BasicAgent extends AgentImpl {
 		    }
 		    
 		    //Allocate entertainment ticket bids.
-		    
+			for (int e = 1; e < 4; e++)
+			{
+				auction = bestEntDay(flightDates[0], flightDates[1], e);
+				agent.setAllocation(auction, agent.getAllocation(auction) + 1);
+			}
 		}
     }
+
+    private int bestEntDay(int inFlight, int outFlight, int type)
+	{
+		for (int i = inFlight; i < outFlight; i++)
+		{
+			int auction = agent.getAuctionFor(TACAgent.CAT_ENTERTAINMENT, type, i);
+			if (agent.getAllocation(auction) < agent.getOwn(auction))
+			{
+				return auction;
+			}
+		}
+		// If no left, just take the first...
+		return agent.getAuctionFor(TACAgent.CAT_ENTERTAINMENT, type, inFlight);
+	}
     
     private int calculateFlightBidValue() {
 		return 1000;
