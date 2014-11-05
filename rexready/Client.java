@@ -2,10 +2,10 @@ package rexready;
 
 public class Client {
 
-    private PackagePreference preferences;
+    private Preferences preferences;
 
     public Client(int arrival, int departure, int hotel_value, int e1, int e2, int e3) {
-	preferences = new PackagePreference(arrival, departure, hotel_value, e1, e2, e3);
+	preferences = new Preferences(arrival, departure, hotel_value, e1, e2, e3);
     }
 
     public int travelPenalty(TravelPackage travelPackage) {
@@ -18,7 +18,9 @@ public class Client {
 
     public int funBonus(EntertainmentPackage entertainmentPackage) {
 	boolean[] includes = entertainmentPackage.includesEntertainmentTypes();
-	return (includes[0] ? preferences.getE1Value() : 0) + (includes[1] ? preferences.getE2Value() : 0) + (includes[2] ? preferences.getE2Value() : 0);
+	return (includes[0] ? preferences.getE1Value() : 0)
+		+ (includes[1] ? preferences.getE2Value() : 0)
+		+ (includes[2] ? preferences.getE2Value() : 0);
     }
 
     public int utility(TravelPackage travelPackage, EntertainmentPackage entertainmentPackage) {
@@ -35,5 +37,9 @@ public class Client {
 
     public int getMaxEntertainmentValue() {
 	return preferences.getE1Value() + preferences.getE2Value() + preferences.getE3Value();
+    }
+    
+    public Preferences getPreferences() {
+	return preferences;
     }
 }
