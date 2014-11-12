@@ -7,7 +7,16 @@ import java.util.Set;
 
 public class EntertainmentPackage {
 
+	private int expectedUtility;
     private List<EntertainmentTicket> tickets = new ArrayList<EntertainmentTicket>();
+    
+    public EntertainmentPackage(int expectedUtility) {
+    	this.expectedUtility = expectedUtility;
+    }
+    
+    public int getExpectedUtility() {
+    	return expectedUtility;
+    }
 
     public boolean feasible(TravelPackage travelPackage) {
 	Set<Integer> dates = new HashSet<Integer>();
