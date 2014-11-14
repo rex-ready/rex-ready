@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import se.sics.tac.aw.AgentImpl;
 import se.sics.tac.aw.Bid;
+import se.sics.tac.aw.Quote;
 import se.sics.tac.aw.TACAgent;
 import se.sics.tac.util.ArgEnumerator;
 
@@ -34,6 +35,45 @@ public class BasicAgent extends AgentImpl {
 
     @Override
     public void auctionClosed(int auction) {
+    }
+    
+    public void quoteUpdated(Quote quote) {
+	int auctionID = quote.getAuction();
+	int auctionCategory = agent.getAuctionCategory(auctionID);
+	if(auctionCategory == TACAgent.CAT_HOTEL) {
+	    int alloc = agent.getAllocation(auctionID);	//Number of bids allocated
+	    int hypotheticalQuantityWon = quote.getHQW();
+	    //If some bids were attempted in this auction and the HQW isn't every ticket bid on
+	    if(alloc > 0 && hypotheticalQuantityWon < alloc) {
+		Bid bid = new Bid(auctionID);
+		bidValues[auctionID] = updateHotelPrice(quote.getAskPrice(), auctionID);
+		bid.addBidPoint(alloc, bidValues[auctionID]);
+		
+		agent.submitBid(bid);
+	    }
+	} else if(auctionCategory == TACAgent.CAT_ENTERTAINMENT) {
+	    int alloc = agent.getAllocation(auctionID);
+	    int ownedTickets = agent.getOwn(auctionID);
+	    int allocDiff = alloc - ownedTickets;
+	    if(allocDiff != 0) {
+		Bid bid = new Bid(auctionID);
+		bidValues[auctionID] = updateEntertainmentPrice(allocDiff, auctionID);
+		bid.addBidPoint(allocDiff, bidValues[auctionID]);
+		agent.submitBid(bid);
+	    }
+	}
+    }
+
+    private int updateEntertainmentPrice(int allocDiff, int auctionID) {
+	if(allocDiff < 0) {
+	    return (int) (200f - (agent.getGameTime() * 120f) / 720000);
+	} else {
+	    return (int) (50f + (agent.getGameTime() * 100f) / 720000);
+	}
+    }
+
+    private int updateHotelPrice(float askPrice, int auctionID) {
+	return (int) (askPrice + 50);
     }
 
     /**
