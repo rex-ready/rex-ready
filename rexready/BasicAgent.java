@@ -1,5 +1,9 @@
 package rexready;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +19,7 @@ import se.sics.tac.util.ArgEnumerator;
 public class BasicAgent extends AgentImpl {
 
     private Client[] clients = new Client[8];
+    boolean[] clientInTT;
     private int[] bidValues = new int[agent.getAuctionNo()];
 
     @Override
@@ -25,6 +30,59 @@ public class BasicAgent extends AgentImpl {
     @Override
     public void gameStarted() {
 	System.out.println("Game start");
+	
+	new Thread(new Runnable() {
+	    public void run() {
+		try {
+		    File file = new File("neededTickets.txt");
+		    if (!file.exists()) {
+			file.createNewFile();
+		    }
+
+		    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+		    BufferedWriter bw = new BufferedWriter(fw);
+
+		    while (agent.getGameTimeLeft() > 0) {
+			Thread.sleep(15000);
+			int[] neededTickets = new int[agent.getAuctionNo()];
+			int index = 0;
+			for (Client c : clients) {
+			    Preferences p = c.getPreferences();
+			    int flightAuction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_INFLIGHT, p.getArrival());
+			    neededTickets[flightAuction]++;
+			    
+			    for(int i=p.getArrival(); i<p.getDeparture(); i++) {
+				int hotelAuction;
+				if(clientInTT[index]){
+				    hotelAuction = agent.getAuctionFor(TACAgent.CAT_HOTEL, TACAgent.TYPE_GOOD_HOTEL, i);
+				} else {
+				    hotelAuction = agent.getAuctionFor(TACAgent.CAT_HOTEL, TACAgent.TYPE_CHEAP_HOTEL, i);
+				}
+				neededTickets[hotelAuction]++;
+			    }
+			    index++;
+			}
+			for(int i=0; i<neededTickets.length; i++) {
+			    int owned = agent.getOwn(i);
+			    int difference = neededTickets[i] - owned;
+			    int auctionCategory = agent.getAuctionCategory(i);
+			    if(auctionCategory == TACAgent.CAT_FLIGHT) {
+				bw.write("Flight Tickets: " + neededTickets[i] + " - " + agent.getOwn(i));
+				bw.newLine();
+			    } else if(auctionCategory == TACAgent.CAT_HOTEL) {
+				bw.write("Hotel Tickets: " + neededTickets[i] + " - " + agent.getOwn(i));
+				bw.newLine();
+			    }
+			}
+			bw.write("-----------------\n");
+		    }
+		    bw.close();
+		} catch (IOException | InterruptedException e) {
+		    e.printStackTrace();
+		}
+	    }
+	}).start();
+	
 	setAuctionAllocations();
 	bid();
     }
@@ -82,7 +140,7 @@ public class BasicAgent extends AgentImpl {
      */
     private void setAuctionAllocations() {
 	System.out.println("Client | Arrival Day | Departure Day | Hotel Value | Ent 1 | Ent 2 | Ent 3 \n");
-	boolean[] inTT = getHotelTypeAssignments();
+	clientInTT = getHotelTypeAssignments();
 	for (int i = 0; i < 8; i++) {
 	    int arrivalPreference = agent.getClientPreference(i, TACAgent.ARRIVAL);
 	    int departurePreference = agent.getClientPreference(i, TACAgent.DEPARTURE);
@@ -109,7 +167,7 @@ public class BasicAgent extends AgentImpl {
 
 	    // Allocate hotel room bids.
 	    for (int j = flightDates[0]; j < flightDates[1]; j++) {
-		int hotelType = inTT[i] ? TACAgent.TYPE_GOOD_HOTEL : TACAgent.TYPE_CHEAP_HOTEL;
+		int hotelType = clientInTT[i] ? TACAgent.TYPE_GOOD_HOTEL : TACAgent.TYPE_CHEAP_HOTEL;
 		auction = agent.getAuctionFor(TACAgent.CAT_HOTEL, hotelType, j);
 		agent.setAllocation(auction, agent.getAllocation(auction) + 1);
 	    }
@@ -132,7 +190,7 @@ public class BasicAgent extends AgentImpl {
 	
 	ArrayList<Integer> topCustomers = new ArrayList<Integer>(sortedHotelValues.values());
 	Collections.reverse(topCustomers);
-	int ttCount = 4;	//The number of TT assignments
+	int ttCount = 5;	//The number of TT assignments
 	for(int i=0; i<ttCount; i++) {
 	    inTampa[topCustomers.get(i)] = true;
 	}
