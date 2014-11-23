@@ -18,6 +18,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import se.sics.tac.aw.AgentImpl;
+import se.sics.tac.aw.Bid;
+import se.sics.tac.aw.Quote;
+import se.sics.tac.aw.TACAgent;
+import se.sics.tac.util.ArgEnumerator;
+
 import com.googlecode.charts4j.AxisLabels;
 import com.googlecode.charts4j.AxisLabelsFactory;
 import com.googlecode.charts4j.AxisStyle;
@@ -32,12 +38,6 @@ import com.googlecode.charts4j.LineChart;
 import com.googlecode.charts4j.LinearGradientFill;
 import com.googlecode.charts4j.Plots;
 
-import se.sics.tac.aw.AgentImpl;
-import se.sics.tac.aw.Bid;
-import se.sics.tac.aw.Quote;
-import se.sics.tac.aw.TACAgent;
-import se.sics.tac.util.ArgEnumerator;
-
 public class BasicAgent extends AgentImpl {
 
     private Client[] clients = new Client[8];
@@ -45,6 +45,9 @@ public class BasicAgent extends AgentImpl {
     private float[] bidValues = new float[agent.getAuctionNo()];
     
     private Map<String, List<Float>> prices = new HashMap<String, List<Float>>();
+    
+    private JFrame graphFrame;
+    private JLabel graphLabel;
 
     @Override
     protected void init(ArgEnumerator args) {
@@ -59,67 +62,119 @@ public class BasicAgent extends AgentImpl {
     public void gameStarted() {
 	System.out.println("Game start");
 	
-	//Each time period:
-	//Flights - Bids if price near minimum.
-	//Hotels - Bid near the end of the minute.
-	//Entertainment - Bid immediately.
+	graphFrame = new JFrame();
+        graphFrame.setSize(600, 450);
+        graphFrame.setVisible(true);
+        graphLabel = new JLabel();
+        graphFrame.add(graphLabel);
+	
+	final int bidInterval = 1000;
+	//Each bid interval:
+	//Flights - Update bids if price near minimum.
+	//Hotels - Update bids if near the end of the minute.
+	//Entertainment - Update bids immediately.
+	//Flights
 	new Thread(new Runnable() {
 	    public void run() {
-		
+		while(agent.getGameTimeLeft() > 0) {
+		    //If price is near its' predicted minimum
+		    //Update bids		    
+		    try {
+			Thread.sleep(bidInterval);
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
+		    }
+		}
 	    }
 	}).start();
 	
+	//Hotels
 	new Thread(new Runnable() {
 	    public void run() {
+		boolean hotelsUpdated = false;
+		while(agent.getGameTimeLeft() > 0) {
+		    //If in the last 10 seconds of a bidding cycle
+		    if((agent.getGameTime() % 60000) > 50000) {
+			if(hotelsUpdated) {
+			    continue;
+			}
+			//Update hotel bids
+			hotelsUpdated = true;
+		    } else {
+			hotelsUpdated = false;
+		    }
+		    try {
+			Thread.sleep(bidInterval);
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
+		    }
+		}
+	    }
+	}).start();
+	
+	//Entertainment
+	new Thread(new Runnable() {
+	    public void run() {
+		//Update bids
 		try {
-		    File file = new File("neededTickets.txt");
-		    if (!file.exists()) {
-			file.createNewFile();
-		    }
-
-		    FileWriter fw = new FileWriter(file.getAbsoluteFile());
-		    BufferedWriter bw = new BufferedWriter(fw);
-
-		    while (agent.getGameTimeLeft() > 0) {
-			Thread.sleep(15000);
-			int[] neededTickets = new int[agent.getAuctionNo()];
-			int index = 0;
-			for (Client c : clients) {
-			    Preferences p = c.getPreferences();
-			    int flightAuction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_INFLIGHT, p.getArrival());
-			    neededTickets[flightAuction]++;
-			    
-			    for(int i=p.getArrival(); i<p.getDeparture(); i++) {
-				int hotelAuction;
-				if(clientInTT[index]){
-				    hotelAuction = agent.getAuctionFor(TACAgent.CAT_HOTEL, TACAgent.TYPE_GOOD_HOTEL, i);
-				} else {
-				    hotelAuction = agent.getAuctionFor(TACAgent.CAT_HOTEL, TACAgent.TYPE_CHEAP_HOTEL, i);
-				}
-				neededTickets[hotelAuction]++;
-			    }
-			    index++;
-			}
-			for(int i=0; i<neededTickets.length; i++) {
-			    int owned = agent.getOwn(i);
-			    int difference = neededTickets[i] - owned;
-			    int auctionCategory = agent.getAuctionCategory(i);
-			    if(auctionCategory == TACAgent.CAT_FLIGHT) {
-				bw.write("Flight Tickets: " + neededTickets[i] + " - " + agent.getOwn(i));
-				bw.newLine();
-			    } else if(auctionCategory == TACAgent.CAT_HOTEL) {
-				bw.write("Hotel Tickets: " + neededTickets[i] + " - " + agent.getOwn(i));
-				bw.newLine();
-			    }
-			}
-			bw.write("-----------------\n");
-		    }
-		    bw.close();
-		} catch (IOException | InterruptedException e) {
+		    Thread.sleep(bidInterval);
+		} catch (InterruptedException e) {
 		    e.printStackTrace();
 		}
 	    }
 	}).start();
+	
+//	new Thread(new Runnable() {
+//	    public void run() {
+//		try {
+//		    File file = new File("neededTickets.txt");
+//		    if (!file.exists()) {
+//			file.createNewFile();
+//		    }
+//
+//		    FileWriter fw = new FileWriter(file.getAbsoluteFile());
+//		    BufferedWriter bw = new BufferedWriter(fw);
+//
+//		    while (agent.getGameTimeLeft() > 0) {
+//			Thread.sleep(15000);
+//			int[] neededTickets = new int[agent.getAuctionNo()];
+//			int index = 0;
+//			for (Client c : clients) {
+//			    Preferences p = c.getPreferences();
+//			    int flightAuction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_INFLIGHT, p.getArrival());
+//			    neededTickets[flightAuction]++;
+//			    
+//			    for(int i=p.getArrival(); i<p.getDeparture(); i++) {
+//				int hotelAuction;
+//				if(clientInTT[index]){
+//				    hotelAuction = agent.getAuctionFor(TACAgent.CAT_HOTEL, TACAgent.TYPE_GOOD_HOTEL, i);
+//				} else {
+//				    hotelAuction = agent.getAuctionFor(TACAgent.CAT_HOTEL, TACAgent.TYPE_CHEAP_HOTEL, i);
+//				}
+//				neededTickets[hotelAuction]++;
+//			    }
+//			    index++;
+//			}
+//			for(int i=0; i<neededTickets.length; i++) {
+//			    int owned = agent.getOwn(i);
+//			    int difference = neededTickets[i] - owned;
+//			    int auctionCategory = agent.getAuctionCategory(i);
+//			    if(auctionCategory == TACAgent.CAT_FLIGHT) {
+//				bw.write("Flight Tickets: " + neededTickets[i] + " - " + agent.getOwn(i));
+//				bw.newLine();
+//			    } else if(auctionCategory == TACAgent.CAT_HOTEL) {
+//				bw.write("Hotel Tickets: " + neededTickets[i] + " - " + agent.getOwn(i));
+//				bw.newLine();
+//			    }
+//			}
+//			bw.write("-----------------\n");
+//		    }
+//		    bw.close();
+//		} catch (IOException | InterruptedException e) {
+//		    e.printStackTrace();
+//		}
+//	    }
+//	}).start();
 	
 	setAuctionAllocations();
 	bid();
@@ -136,7 +191,7 @@ public class BasicAgent extends AgentImpl {
 	    FileWriter fw = new FileWriter(file.getAbsoluteFile());
 	    BufferedWriter bw = new BufferedWriter(fw);
 	    for (int i = 0; i < TACAgent.getAuctionNo(); i++) {
-		bw.write(createChart(i));
+		bw.write(prices.get(agent.getAuctionTypeAsString(i)).size() + "  " + createChart(i));
 		bw.newLine();
 	    }
 	    bw.close();
@@ -182,6 +237,21 @@ public class BasicAgent extends AgentImpl {
 		bid.addBidPoint(allocDiff, bidValues[auctionID]);
 		agent.submitBid(bid);
 	    }
+	   
+	    int flightGraphID = 0;
+	    if (auctionID == flightGraphID) {
+		String url = createChart(flightGraphID);
+		Image image = null;
+		try {
+		    URL imageLocation = new URL(url);
+		    image = ImageIO.read(imageLocation);
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+		graphLabel.setIcon(new ImageIcon(image));
+		graphFrame.repaint();
+	    }
+	    
 	} else if(auctionCategory == TACAgent.CAT_HOTEL) {
 //	    System.err.println("UPDATED HOTEL");
 	    int alloc = agent.getAllocation(auctionID);	//Number of bids allocated
@@ -368,17 +438,24 @@ public class BasicAgent extends AgentImpl {
     private String createChart(int auctionID) {
 	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
 	
-	Data data = DataUtil.scaleWithinRange(0, 1000, prices.get(typeString));
+	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
+	if(agent.getAuctionCategory(auctionID) == TACAgent.CAT_FLIGHT) {
+	    float lastValue = priceValues.get(priceValues.size() - 1);
+	    for(int i=priceValues.size(); i<54; i++) {
+		priceValues.add(lastValue);
+	    }
+	}
 	
+	Data data = DataUtil.scaleWithinRange(0, 1000, priceValues);
 	Line line = Plots.newLine(data, Color.GREEN);
 
 	LineChart chart = GCharts.newLineChart(line);
-        chart.setSize(600, 450);
+        chart.setSize(550, 400);
         chart.setTitle(typeString, Color.WHITE, 14);
         chart.setGrid(10, 10, 3, 2);
 
         // Defining axis info and styles
-        chart.addXAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, prices.get(typeString).size()));
+        chart.addXAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, priceValues.size()));
         chart.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, 1000));
         
         AxisLabels xAxisLabel = AxisLabelsFactory.newAxisLabels("Price Changes", 50.0);
