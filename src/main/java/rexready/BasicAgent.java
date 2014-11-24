@@ -48,7 +48,9 @@ public class BasicAgent extends AgentImpl {
     
     private JFrame graphFrame;
     private JLabel graphLabel;
-
+    
+    private FlightPricePredictor flightPredictor = new FlightPricePredictor();
+    
     @Override
     protected void init(ArgEnumerator args) {
 	System.out.println("Agent start");
@@ -241,6 +243,21 @@ public class BasicAgent extends AgentImpl {
 	prices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
 	
 	if(auctionCategory == TACAgent.CAT_FLIGHT) {
+		int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
+		int flightID = auctionID;
+		if (flightPredictor.previousPrices[flightID] == 0)
+		{
+			flightPredictor.previousPrices[flightID] = quote.getAskPrice();
+		}
+		else
+		{
+			flightPredictor.previousPrices[flightID] = flightPredictor.currentPrices[flightID];
+		}
+		flightPredictor.currentPrices[flightID] = quote.getAskPrice();
+		flightPredictor.updateProbabilityDistribution(flightID, t);
+		float predictedMinPrice = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
+		System.out.println(flightPredictor.probabilityDistributions[auctionID][0]);
+		System.out.format("Current price, %f,predictedMinimum %f\n", quote.getAskPrice(), predictedMinPrice);
 //	    System.err.println("UPDATED FLIGHT");
 	    int alloc = agent.getAllocation(auctionID);
 	    int ownedTickets = agent.getOwn(auctionID);
