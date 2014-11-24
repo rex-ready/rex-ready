@@ -42,7 +42,7 @@ public class BasicAgent extends AgentImpl {
 
     private Client[] clients = new Client[8];
     boolean[] clientInTT;
-    private float[] bidValues = new float[agent.getAuctionNo()];
+    private float[] bidValues = new float[TACAgent.getAuctionNo()];
     
     private Map<String, List<Float>> prices = new HashMap<String, List<Float>>();
     
@@ -191,7 +191,7 @@ public class BasicAgent extends AgentImpl {
 	    FileWriter fw = new FileWriter(file.getAbsoluteFile());
 	    BufferedWriter bw = new BufferedWriter(fw);
 	    for (int i = 0; i < TACAgent.getAuctionNo(); i++) {
-		bw.write(prices.get(agent.getAuctionTypeAsString(i)).size() + "  " + createChart(i));
+		bw.write(prices.get(TACAgent.getAuctionTypeAsString(i)).size() + "  " + createChart(i));
 		bw.newLine();
 	    }
 	    bw.close();
@@ -220,7 +220,7 @@ public class BasicAgent extends AgentImpl {
     
     public void quoteUpdated(Quote quote) {
 	int auctionID = quote.getAuction();
-	int auctionCategory = agent.getAuctionCategory(auctionID);
+	int auctionCategory = TACAgent.getAuctionCategory(auctionID);
 	
 	System.out.println(TACAgent.getAuctionTypeAsString(auctionID) + " -- " + quote.getAskPrice());
 	prices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
@@ -320,16 +320,16 @@ public class BasicAgent extends AgentImpl {
 	    int[] flightDates = pickFlightDates(preferences);
 	    // Obtain the auction ID for the flight tickets on the preferred
 	    // day.
-	    int auction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_INFLIGHT, flightDates[0]);
+	    int auction = TACAgent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_INFLIGHT, flightDates[0]);
 	    // Increment the number of tickets required from that auction.
 	    agent.setAllocation(auction, agent.getAllocation(auction) + 1);
-	    auction = agent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_OUTFLIGHT, flightDates[1]);
+	    auction = TACAgent.getAuctionFor(TACAgent.CAT_FLIGHT, TACAgent.TYPE_OUTFLIGHT, flightDates[1]);
 	    agent.setAllocation(auction, agent.getAllocation(auction) + 1);
 
 	    // Allocate hotel room bids.
 	    for (int j = flightDates[0]; j < flightDates[1]; j++) {
 		int hotelType = clientInTT[i] ? TACAgent.TYPE_GOOD_HOTEL : TACAgent.TYPE_CHEAP_HOTEL;
-		auction = agent.getAuctionFor(TACAgent.CAT_HOTEL, hotelType, j);
+		auction = TACAgent.getAuctionFor(TACAgent.CAT_HOTEL, hotelType, j);
 		agent.setAllocation(auction, agent.getAllocation(auction) + 1);
 	    }
 
@@ -361,13 +361,13 @@ public class BasicAgent extends AgentImpl {
     
     private int bestEntDay(int inFlight, int outFlight, int type) {
 	for (int i = inFlight; i < outFlight; i++) {
-	    int auction = agent.getAuctionFor(TACAgent.CAT_ENTERTAINMENT, type, i);
+	    int auction = TACAgent.getAuctionFor(TACAgent.CAT_ENTERTAINMENT, type, i);
 	    if (agent.getAllocation(auction) < agent.getOwn(auction)) {
 		return auction;
 	    }
 	}
 	// If no left, just take the first...
-	return agent.getAuctionFor(TACAgent.CAT_ENTERTAINMENT, type, inFlight);
+	return TACAgent.getAuctionFor(TACAgent.CAT_ENTERTAINMENT, type, inFlight);
     }
 
     private int calculateFlightBidValue() {
@@ -383,13 +383,13 @@ public class BasicAgent extends AgentImpl {
     }
 
     private void bid() {
-	for (int i = 0; i < agent.getAuctionNo(); i++) {
+	for (int i = 0; i < TACAgent.getAuctionNo(); i++) {
 	    // Amount of tickets allocated as required minus the amount already
 	    // owned = Amount still needed.
 	    int amountRequired = agent.getAllocation(i) - agent.getOwn(i);
 
 	    int bidValue = 0;
-	    switch (agent.getAuctionCategory(i)) {
+	    switch (TACAgent.getAuctionCategory(i)) {
 	    case TACAgent.CAT_FLIGHT:
 		bidValue = calculateFlightBidValue();
 		break;
@@ -439,7 +439,7 @@ public class BasicAgent extends AgentImpl {
 	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
 	
 	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
-	if(agent.getAuctionCategory(auctionID) == TACAgent.CAT_FLIGHT) {
+	if(TACAgent.getAuctionCategory(auctionID) == TACAgent.CAT_FLIGHT) {
 	    float lastValue = priceValues.get(priceValues.size() - 1);
 	    for(int i=priceValues.size(); i<54; i++) {
 		priceValues.add(lastValue);
