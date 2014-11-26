@@ -183,18 +183,33 @@ public class BasicAgent extends AgentImpl {
     @Override
     public void gameStopped() {
 	try {
-	    File file = new File("finalChartURLs.txt");
-	    if (!file.exists()) {
-		file.createNewFile();
+	    File chartsFile = new File("finalChartURLs.txt");
+	    if (!chartsFile.exists()) {
+		chartsFile.createNewFile();
+	    }
+	    File priceFile = new File("prices.txt");
+	    if (!priceFile.exists()) {
+		priceFile.createNewFile();
 	    }
 
-	    FileWriter fw = new FileWriter(file.getAbsoluteFile());
-	    BufferedWriter bw = new BufferedWriter(fw);
+	    FileWriter fwCharts = new FileWriter(chartsFile.getAbsoluteFile());
+	    BufferedWriter bwCharts = new BufferedWriter(fwCharts);
+	    FileWriter fwPrices = new FileWriter(priceFile.getAbsoluteFile());
+	    BufferedWriter bwPrices = new BufferedWriter(fwPrices);
 	    for (int i = 0; i < TACAgent.getAuctionNo(); i++) {
-		bw.write(prices.get(TACAgent.getAuctionTypeAsString(i)).size() + "  " + createChart(i));
-		bw.newLine();
+		List<Float> priceList = prices.get(TACAgent.getAuctionTypeAsString(i));
+		bwCharts.write(priceList.size() + "  " + createChart(i));
+		bwCharts.newLine();
+		
+		bwPrices.write("Auction " + i);
+		bwPrices.newLine();
+		for(Float f : priceList) {
+		    bwPrices.write(f + " ");
+		}
+		bwPrices.newLine();
 	    }
-	    bw.close();
+	    bwCharts.close();
+	    bwPrices.close();
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
