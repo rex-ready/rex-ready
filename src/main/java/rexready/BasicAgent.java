@@ -54,6 +54,7 @@ public class BasicAgent extends AgentImpl {
     private JLabel graphLabel;
     
     private FlightPricePredictor flightPredictor = new FlightPricePredictor();
+    private HotelPricePredictor hotelPredictor = new HotelPricePredictor();
     
     @Override
     protected void init(ArgEnumerator args) {
@@ -133,6 +134,27 @@ public class BasicAgent extends AgentImpl {
 	    }
 	}).start();
 	
+	//hotel price prediction
+	new Thread(new Runnable() {
+	    public void run() {
+		while(agent.getGameTime() < 65000) {
+			int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
+			hotelPredictor.updateDeltas(t);
+		    try {
+			Thread.sleep(1000);
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
+		    }
+		}
+		while(agent.getGameTimeLeft() > 0) {
+		    try {
+			Thread.sleep(60000);
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
+		    }
+		}
+	    }
+	}).start();
 //	new Thread(new Runnable() {
 //	    public void run() {
 //		try {
@@ -248,6 +270,13 @@ public class BasicAgent extends AgentImpl {
 
     @Override
     public void auctionClosed(int auction) {
+    	int auctionCategory = agent.getAuctionCategory(auction);
+    	if(auctionCategory == TACAgent.CAT_HOTEL)
+    	{
+    		int hotelID = auction - 8;
+    		int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
+    		hotelPredictor.closed[hotelID] = t;
+    	}
     }
     
     public void quoteUpdated(Quote quote) {
@@ -304,6 +333,20 @@ public class BasicAgent extends AgentImpl {
 	    
 	} else if(auctionCategory == TACAgent.CAT_HOTEL) {
 //	    System.err.println("UPDATED HOTEL");
+	    int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
+	    int hotelID = auctionID - 8;
+	    if (hotelPredictor.initialized[hotelID] == false)
+	    {
+	    	hotelPredictor.previousPrices[hotelID] = quote.getAskPrice();
+	    	hotelPredictor.initialized[hotelID] = true;
+	    }
+	    else
+	    {
+	    	hotelPredictor.previousPrices[hotelID] = hotelPredictor.currentPrices[hotelID];
+	    }
+	    hotelPredictor.currentPrices[hotelID] = quote.getAskPrice();
+
+
 	    int alloc = agent.getAllocation(auctionID);	//Number of bids allocated
 	    int hypotheticalQuantityWon = quote.getHQW();
 	    //If some bids were attempted in this auction and the HQW isn't every ticket bid on
