@@ -283,7 +283,7 @@ public class BasicAgent extends AgentImpl {
 	int auctionID = quote.getAuction();
 	int auctionCategory = TACAgent.getAuctionCategory(auctionID);
 	
-	System.out.println(TACAgent.getAuctionTypeAsString(auctionID) + " -- " + quote.getAskPrice());
+	//System.out.println(TACAgent.getAuctionTypeAsString(auctionID) + " -- " + quote.getAskPrice());
 	prices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
 	
 	if(auctionCategory == TACAgent.CAT_FLIGHT) {
@@ -300,8 +300,6 @@ public class BasicAgent extends AgentImpl {
 	    flightPredictor.currentPrices[flightID] = quote.getAskPrice();
 	    flightPredictor.updateProbabilityDistribution(flightID, t);
 	    float predictedMinPrice = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
-	    System.out.println(flightPredictor.probabilityDistributions[auctionID][0]);
-	    System.out.format("Current price, %f,predictedMinimum %f\n", quote.getAskPrice(), predictedMinPrice);
 //	    System.err.println("UPDATED FLIGHT");
 	    int alloc = agent.getAllocation(auctionID);
 	    int ownedTickets = agent.getOwn(auctionID);
@@ -309,7 +307,7 @@ public class BasicAgent extends AgentImpl {
 	    if(allocDiff > 0) {
 		Bid bid = new Bid(auctionID);
 		bidValues[auctionID] = updateFlightPrice(allocDiff, quote);
-		System.out.println("Trying to bid at: " + bidValues[auctionID]);
+		//System.out.println("Trying to bid at: " + bidValues[auctionID]);
 		bid.addBidPoint(allocDiff, bidValues[auctionID]);
 		agent.submitBid(bid);
 	    }
@@ -353,7 +351,7 @@ public class BasicAgent extends AgentImpl {
 	    if(alloc > 0 && quote.hasHQW(agent.getBid(auctionID)) && hypotheticalQuantityWon < alloc) {
 		Bid bid = new Bid(auctionID);
 		bidValues[auctionID] = updateHotelPrice(quote);
-		System.out.println("Trying to bid at: " + bidValues[auctionID]);
+		//System.out.println("Trying to bid at: " + bidValues[auctionID]);
 		bid.addBidPoint(alloc, bidValues[auctionID]);
 		
 		agent.submitBid(bid);
@@ -366,7 +364,7 @@ public class BasicAgent extends AgentImpl {
 	    if(allocDiff != 0) {
 		Bid bid = new Bid(auctionID);
 		bidValues[auctionID] = updateEntertainmentPrice(allocDiff, quote);
-		System.out.println("Trying to bid at: " + bidValues[auctionID]);
+		//System.out.println("Trying to bid at: " + bidValues[auctionID]);
 		bid.addBidPoint(allocDiff, bidValues[auctionID]);
 		agent.submitBid(bid);
 	    }
@@ -374,17 +372,17 @@ public class BasicAgent extends AgentImpl {
     }
 
     private float updateFlightPrice(int allocDiff, Quote quote) {
-	System.out.println(quote.getAskPrice());
+	//System.out.println(quote.getAskPrice());
 	return quote.getAskPrice();
     }
 
     private float updateHotelPrice(Quote quote) {
-	System.out.println((quote.getAskPrice() + 50.f));
+	//System.out.println((quote.getAskPrice() + 50.f));
 	return quote.getAskPrice() + 50.f;
     }
     
     private float updateEntertainmentPrice(int allocDiff, Quote quote) {
-	System.out.println(((quote.getAskPrice() + quote.getBidPrice()) / 2.f));
+	//System.out.println(((quote.getAskPrice() + quote.getBidPrice()) / 2.f));
 	return (quote.getAskPrice() + quote.getBidPrice()) / 2.f;
     }
 
@@ -513,19 +511,19 @@ public class BasicAgent extends AgentImpl {
 
     @Override
     public void bidUpdated(Bid bid) {
-	System.err.println("Bid " + bid.getID() + " updated.");
-	System.err.println("Auction: " + bid.getAuction());
-	System.err.println("State: " + bid.getProcessingStateAsString());
+	//System.err.println("Bid " + bid.getID() + " updated.");
+	//System.err.println("Auction: " + bid.getAuction());
+	//System.err.println("State: " + bid.getProcessingStateAsString());
     }
 
     @Override
     public void bidRejected(Bid bid) {
-	System.err.println("Bid " + bid.getID() + " rejected.");
+	//System.err.println("Bid " + bid.getID() + " rejected.");
     }
 
     @Override
     public void bidError(Bid bid, int error) {
-	System.err.println("Bid " + bid.getID() + " error. - " + agent.commandStatusToString(error));
+	//System.err.println("Bid " + bid.getID() + " error. - " + agent.commandStatusToString(error));
     }
     
     private String createFixedWidthChart(int auctionID, int width) {
