@@ -6,8 +6,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +192,10 @@ public class BasicAgent extends AgentImpl {
     @Override
     public void gameStopped() {
 	try {
-	    File chartsFile = new File("finalChartURLs.txt");
+	    DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
+	    Date date = new Date();
+	    
+	    File chartsFile = new File(dateFormat.format(date) + ".txt");
 	    if (!chartsFile.exists()) {
 		chartsFile.createNewFile();
 	    }
