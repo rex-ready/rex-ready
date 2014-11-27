@@ -45,6 +45,7 @@ public class BasicAgent extends AgentImpl {
     private float[] bidValues = new float[TACAgent.getAuctionNo()];
     
     private Map<String, List<Float>> prices = new HashMap<String, List<Float>>();
+    private Map<String, List<Float>> predictedMinimumFlightPrices = new HashMap<String, List<Float>>();
     
     private JFrame graphFrame;
     private JLabel graphLabel;
@@ -57,6 +58,9 @@ public class BasicAgent extends AgentImpl {
 	
 	for(int i=0; i<TACAgent.getAuctionNo(); i++) {
 	    prices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
+	    if(i < 8) {
+		predictedMinimumFlightPrices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
+	    }
 	}
     }
 
@@ -200,7 +204,12 @@ public class BasicAgent extends AgentImpl {
 	    BufferedWriter bwPrices = new BufferedWriter(fwPrices);
 	    for (int i = 0; i < TACAgent.getAuctionNo(); i++) {
 		List<Float> priceList = prices.get(TACAgent.getAuctionTypeAsString(i));
-		bwCharts.write(priceList.size() + "  " + createChart(i));
+		if(TACAgent.getAuctionCategory(i) == TACAgent.CAT_FLIGHT) {
+		    String url = createFlightPredictionChart(i, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(i)));
+		    bwCharts.write(url);
+		} else {
+		    bwCharts.write(createChart(i));
+		}
 		bwCharts.newLine();
 		
 		bwPrices.write("Auction " + i);
@@ -243,21 +252,21 @@ public class BasicAgent extends AgentImpl {
 	prices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
 	
 	if(auctionCategory == TACAgent.CAT_FLIGHT) {
-		int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
-		int flightID = auctionID;
-		if (flightPredictor.previousPrices[flightID] == 0)
-		{
-			flightPredictor.previousPrices[flightID] = quote.getAskPrice();
-		}
-		else
-		{
-			flightPredictor.previousPrices[flightID] = flightPredictor.currentPrices[flightID];
-		}
-		flightPredictor.currentPrices[flightID] = quote.getAskPrice();
-		flightPredictor.updateProbabilityDistribution(flightID, t);
-		float predictedMinPrice = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
-		System.out.println(flightPredictor.probabilityDistributions[auctionID][0]);
-		System.out.format("Current price, %f,predictedMinimum %f\n", quote.getAskPrice(), predictedMinPrice);
+	    int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
+	    int flightID = auctionID;
+	    if (flightPredictor.previousPrices[flightID] == 0)
+	    {
+		flightPredictor.previousPrices[flightID] = quote.getAskPrice();
+	    }
+	    else
+	    {
+		flightPredictor.previousPrices[flightID] = flightPredictor.currentPrices[flightID];
+	    }
+	    flightPredictor.currentPrices[flightID] = quote.getAskPrice();
+	    flightPredictor.updateProbabilityDistribution(flightID, t);
+	    float predictedMinPrice = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
+	    System.out.println(flightPredictor.probabilityDistributions[auctionID][0]);
+	    System.out.format("Current price, %f,predictedMinimum %f\n", quote.getAskPrice(), predictedMinPrice);
 //	    System.err.println("UPDATED FLIGHT");
 	    int alloc = agent.getAllocation(auctionID);
 	    int ownedTickets = agent.getOwn(auctionID);
@@ -269,10 +278,13 @@ public class BasicAgent extends AgentImpl {
 		bid.addBidPoint(allocDiff, bidValues[auctionID]);
 		agent.submitBid(bid);
 	    }
-	   
+	    
+	    predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(predictedMinPrice);
+	    
 	    int flightGraphID = 0;
-	    if (auctionID == flightGraphID) {
-		String url = createChart(flightGraphID);
+	    if (auctionID == flightGraphID) {		
+//		String url = createFixedWidthChart(flightGraphID, 54);
+		String url = createFlightPredictionChart(flightGraphID, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)));
 		Image image = null;
 		try {
 		    URL imageLocation = new URL(url);
@@ -467,21 +479,79 @@ public class BasicAgent extends AgentImpl {
 	System.err.println("Bid " + bid.getID() + " error. - " + agent.commandStatusToString(error));
     }
     
+    private String createFixedWidthChart(int auctionID, int width) {
+	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
+	
+	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
+	float lastValue = priceValues.get(priceValues.size() - 1);
+	for(int i=priceValues.size(); i<width; i++) {
+	    priceValues.add(lastValue);
+	}
+	
+	return createChart(priceValues, typeString);
+    }
+    
     private String createChart(int auctionID) {
 	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
 	
 	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
-	if(TACAgent.getAuctionCategory(auctionID) == TACAgent.CAT_FLIGHT) {
-	    float lastValue = priceValues.get(priceValues.size() - 1);
-	    for(int i=priceValues.size(); i<54; i++) {
-		priceValues.add(lastValue);
-	    }
-	}
 	
+	return createChart(priceValues, typeString);
+    }
+    
+    private String createChart(List<Float> priceValues, String typeString) {	
 	Data data = DataUtil.scaleWithinRange(0, 1000, priceValues);
 	Line line = Plots.newLine(data, Color.GREEN);
 
 	LineChart chart = GCharts.newLineChart(line);
+        chart.setSize(550, 400);
+        chart.setTitle(typeString, Color.WHITE, 14);
+        chart.setGrid(10, 10, 3, 2);
+
+        // Defining axis info and styles
+        chart.addXAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, priceValues.size()));
+        chart.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, 1000));
+        
+        AxisLabels xAxisLabel = AxisLabelsFactory.newAxisLabels("Price Changes", 50.0);
+        xAxisLabel.setAxisStyle(AxisStyle.newAxisStyle(Color.WHITE, 14, AxisTextAlignment.CENTER));
+        
+        AxisLabels yAxisLabel = AxisLabelsFactory.newAxisLabels("Prices", 50.0);
+        yAxisLabel.setAxisStyle(AxisStyle.newAxisStyle(Color.WHITE, 14, AxisTextAlignment.CENTER));
+
+        // Adding axis info to chart.
+        chart.addXAxisLabels(xAxisLabel);
+        chart.addYAxisLabels(yAxisLabel); 
+
+        // Defining background and chart fills.
+        chart.setBackgroundFill(Fills.newSolidFill(Color.newColor("1F1D1D")));
+        LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("363433"), 100);
+        fill.addColorAndOffset(Color.newColor("2E2B2A"), 0);
+        chart.setAreaFill(fill);
+        String url = chart.toURLString();
+	
+	return url;
+    }
+    
+    private String createFlightPredictionChart(int auctionID, List<Float> predictions) {
+	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
+	
+	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
+	float lastPriceValue = priceValues.get(priceValues.size() - 1);
+	for(int i=priceValues.size(); i<54; i++) {
+	    priceValues.add(lastPriceValue);
+	}
+	List<Float> predictionList = new ArrayList<Float>(predictions);
+	float lastPredictionValue = predictionList.get(predictionList.size() - 1);
+	for(int i=predictionList.size(); i<54; i++) {
+	    predictionList.add(lastPredictionValue);
+	}
+	
+	Data priceData = DataUtil.scaleWithinRange(0, 1000, priceValues);
+	Data predictionData = DataUtil.scaleWithinRange(0, 1000, predictionList);
+	Line priceLine = Plots.newLine(priceData, Color.GREEN);
+	Line predictionLine = Plots.newLine(predictionData, Color.RED);
+
+	LineChart chart = GCharts.newLineChart(priceLine, predictionLine);
         chart.setSize(550, 400);
         chart.setTitle(typeString, Color.WHITE, 14);
         chart.setGrid(10, 10, 3, 2);
