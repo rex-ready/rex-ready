@@ -1,12 +1,12 @@
 package rexready;
 
-public class Preferences {
+public class ClientPreferences {
 
     private int arrival, departure;
     private int hotelValue;
     private int e1Value, e2Value, e3Value;
     
-    public Preferences(int arrival, int departure, int hotelValue, int e1Value, int e2Value, int e3Value) {
+    public ClientPreferences(int arrival, int departure, int hotelValue, int e1Value, int e2Value, int e3Value) {
 	this.arrival = arrival;
 	this.departure = departure;
 	this.hotelValue = hotelValue;
