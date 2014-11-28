@@ -43,7 +43,7 @@ import com.googlecode.charts4j.Plots;
 
 public class BasicAgent extends AgentImpl {
 
-    private Client[] clients = new Client[8];
+    private Preferences[] clientPreferences = new Preferences[8];
     boolean[] clientInTT;
     private float[] bidValues = new float[TACAgent.getAuctionNo()];
     
@@ -403,9 +403,8 @@ public class BasicAgent extends AgentImpl {
 	    eValues[2] = agent.getClientPreference(i, TACAgent.E3);
 	    System.out.format("%6d | %11d | %13d | %11d | %5d | %5d | %5d\n", i, arrivalPreference, departurePreference, hotelValue, eValues[0],
 		    eValues[1], eValues[2]);
-	    clients[i] = new Client(arrivalPreference, departurePreference, hotelValue, eValues[0], eValues[1], eValues[2]);
-	    Client c = clients[i];
-	    Preferences preferences = c.getPreferences();
+	    clientPreferences[i] = new Preferences(arrivalPreference, departurePreference, hotelValue, eValues[0], eValues[1], eValues[2]);
+	    Preferences preferences = clientPreferences[i];
 
 	    // Allocate flight ticket bids.
 	    int[] flightDates = pickFlightDates(preferences);
