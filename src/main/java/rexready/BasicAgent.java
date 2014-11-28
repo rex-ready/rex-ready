@@ -58,7 +58,7 @@ public class BasicAgent extends AgentImpl {
     
     @Override
     protected void init(ArgEnumerator args) {
-	System.out.println("Agent start");
+	System.err.println("Agent start");
 	
 	for(int i=0; i<TACAgent.getAuctionNo(); i++) {
 	    prices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
@@ -70,7 +70,7 @@ public class BasicAgent extends AgentImpl {
 
     @Override
     public void gameStarted() {
-	System.out.println("Game start");
+	System.err.println("Game start");
 	
 	graphFrame = new JFrame();
         graphFrame.setSize(600, 450);
@@ -283,7 +283,7 @@ public class BasicAgent extends AgentImpl {
 	int auctionID = quote.getAuction();
 	int auctionCategory = TACAgent.getAuctionCategory(auctionID);
 	
-	//System.out.println(TACAgent.getAuctionTypeAsString(auctionID) + " -- " + quote.getAskPrice());
+	//System.err.println(TACAgent.getAuctionTypeAsString(auctionID) + " -- " + quote.getAskPrice());
 	prices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
 	
 	if(auctionCategory == TACAgent.CAT_FLIGHT) {
@@ -307,7 +307,7 @@ public class BasicAgent extends AgentImpl {
 	    if(allocDiff > 0) {
 		Bid bid = new Bid(auctionID);
 		bidValues[auctionID] = updateFlightPrice(allocDiff, quote);
-		//System.out.println("Trying to bid at: " + bidValues[auctionID]);
+		//System.err.println("Trying to bid at: " + bidValues[auctionID]);
 		bid.addBidPoint(allocDiff, bidValues[auctionID]);
 		agent.submitBid(bid);
 	    }
@@ -351,7 +351,7 @@ public class BasicAgent extends AgentImpl {
 	    if(alloc > 0 && quote.hasHQW(agent.getBid(auctionID)) && hypotheticalQuantityWon < alloc) {
 		Bid bid = new Bid(auctionID);
 		bidValues[auctionID] = updateHotelPrice(quote);
-		//System.out.println("Trying to bid at: " + bidValues[auctionID]);
+		//System.err.println("Trying to bid at: " + bidValues[auctionID]);
 		bid.addBidPoint(alloc, bidValues[auctionID]);
 		
 		agent.submitBid(bid);
@@ -364,7 +364,7 @@ public class BasicAgent extends AgentImpl {
 	    if(allocDiff != 0) {
 		Bid bid = new Bid(auctionID);
 		bidValues[auctionID] = updateEntertainmentPrice(allocDiff, quote);
-		//System.out.println("Trying to bid at: " + bidValues[auctionID]);
+		//System.err.println("Trying to bid at: " + bidValues[auctionID]);
 		bid.addBidPoint(allocDiff, bidValues[auctionID]);
 		agent.submitBid(bid);
 	    }
@@ -372,17 +372,17 @@ public class BasicAgent extends AgentImpl {
     }
 
     private float updateFlightPrice(int allocDiff, Quote quote) {
-	//System.out.println(quote.getAskPrice());
+	//System.err.println(quote.getAskPrice());
 	return quote.getAskPrice();
     }
 
     private float updateHotelPrice(Quote quote) {
-	//System.out.println((quote.getAskPrice() + 50.f));
+	//System.err.println((quote.getAskPrice() + 50.f));
 	return quote.getAskPrice() + 50.f;
     }
     
     private float updateEntertainmentPrice(int allocDiff, Quote quote) {
-	//System.out.println(((quote.getAskPrice() + quote.getBidPrice()) / 2.f));
+	//System.err.println(((quote.getAskPrice() + quote.getBidPrice()) / 2.f));
 	return (quote.getAskPrice() + quote.getBidPrice()) / 2.f;
     }
 
@@ -391,7 +391,7 @@ public class BasicAgent extends AgentImpl {
      * bid on in each auction.
      */
     private void setAuctionAllocations() {
-	System.out.println("Client | Arrival Day | Departure Day | Hotel Value | Ent 1 | Ent 2 | Ent 3 \n");
+	System.err.println("Client | Arrival Day | Departure Day | Hotel Value | Ent 1 | Ent 2 | Ent 3 \n");
 	clientInTT = getHotelTypeAssignments();
 	for (int i = 0; i < 8; i++) {
 	    int arrivalPreference = agent.getClientPreference(i, TACAgent.ARRIVAL);
@@ -401,7 +401,7 @@ public class BasicAgent extends AgentImpl {
 	    eValues[0] = agent.getClientPreference(i, TACAgent.E1);
 	    eValues[1] = agent.getClientPreference(i, TACAgent.E2);
 	    eValues[2] = agent.getClientPreference(i, TACAgent.E3);
-	    System.out.format("%6d | %11d | %13d | %11d | %5d | %5d | %5d\n", i, arrivalPreference, departurePreference, hotelValue, eValues[0],
+	    System.err.format("%6d | %11d | %13d | %11d | %5d | %5d | %5d\n", i, arrivalPreference, departurePreference, hotelValue, eValues[0],
 		    eValues[1], eValues[2]);
 	    clientPreferences[i] = new ClientPreferences(arrivalPreference, departurePreference, hotelValue, eValues[0], eValues[1], eValues[2]);
 	    ClientPreferences preferences = clientPreferences[i];
