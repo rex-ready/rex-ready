@@ -168,11 +168,11 @@ public class BasicAgent extends AgentImpl {
 			DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
 			Date date = new Date();
 
-			File chartsFile = new File(dateFormat.format(date) + ".txt");
+			File chartsFile = new File(dateFormat.format(date) + "charts.txt");
 			if (!chartsFile.exists()) {
 				chartsFile.createNewFile();
 			}
-			File priceFile = new File("prices.txt");
+			File priceFile = new File(dateFormat.format(date) + "prices.txt");
 			if (!priceFile.exists()) {
 				priceFile.createNewFile();
 			}
