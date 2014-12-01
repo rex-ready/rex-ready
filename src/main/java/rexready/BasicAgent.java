@@ -47,8 +47,9 @@ public class BasicAgent extends AgentImpl {
     boolean[] clientInTT;
     private float[] bidValues = new float[TACAgent.getAuctionNo()];
     
-    private Map<String, List<Float>> prices = new HashMap<String, List<Float>>();
+    private Map<String, List<Float>> askPrices = new HashMap<String, List<Float>>();
     private Map<String, List<Float>> predictedMinimumFlightPrices = new HashMap<String, List<Float>>();
+    private Map<String, List<Float>> bidPrices = new HashMap<String, List<Float>>();
     
     private JFrame graphFrame;
     private JLabel graphLabel;
@@ -61,7 +62,8 @@ public class BasicAgent extends AgentImpl {
 	System.err.println("Agent start");
 	
 	for(int i=0; i<TACAgent.getAuctionNo(); i++) {
-	    prices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
+	    askPrices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
+	    bidPrices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
 	    if(i < 8) {
 		predictedMinimumFlightPrices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
 	    }
@@ -231,7 +233,8 @@ public class BasicAgent extends AgentImpl {
 	    FileWriter fwPrices = new FileWriter(priceFile.getAbsoluteFile());
 	    BufferedWriter bwPrices = new BufferedWriter(fwPrices);
 	    for (int i = 0; i < TACAgent.getAuctionNo(); i++) {
-		List<Float> priceList = prices.get(TACAgent.getAuctionTypeAsString(i));
+		List<Float> askPriceList = askPrices.get(TACAgent.getAuctionTypeAsString(i));
+		List<Float> bidPriceList = bidPrices.get(TACAgent.getAuctionTypeAsString(i));
 		if(TACAgent.getAuctionCategory(i) == TACAgent.CAT_FLIGHT) {
 		    String url = createFlightPredictionChart(i, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(i)));
 		    bwCharts.write(url);
@@ -242,9 +245,16 @@ public class BasicAgent extends AgentImpl {
 		
 		bwPrices.write("Auction " + i);
 		bwPrices.newLine();
-		for(Float f : priceList) {
+		for(Float f : askPriceList) {
 		    bwPrices.write(f + " ");
 		}
+		if(TACAgent.getAuctionCategory(i) == TACAgent.CAT_ENTERTAINMENT) {
+		    bwPrices.newLine();
+		    for(Float b : bidPriceList) {
+			bwPrices.write(b + " ");
+		    }
+		}
+		
 		bwPrices.newLine();
 	    }
 	    bwCharts.close();
@@ -284,7 +294,8 @@ public class BasicAgent extends AgentImpl {
 	int auctionCategory = TACAgent.getAuctionCategory(auctionID);
 	
 	//System.err.println(TACAgent.getAuctionTypeAsString(auctionID) + " -- " + quote.getAskPrice());
-	prices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
+	askPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
+	bidPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getBidPrice());
 	
 	if(auctionCategory == TACAgent.CAT_FLIGHT) {
 	    int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
@@ -528,7 +539,7 @@ public class BasicAgent extends AgentImpl {
     private String createFixedWidthChart(int auctionID, int width) {
 	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
 	
-	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
+	List<Float> priceValues = new ArrayList<Float>(askPrices.get(typeString));
 	float lastValue = priceValues.get(priceValues.size() - 1);
 	for(int i=priceValues.size(); i<width; i++) {
 	    priceValues.add(lastValue);
@@ -540,7 +551,7 @@ public class BasicAgent extends AgentImpl {
     private String createChart(int auctionID) {
 	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
 	
-	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
+	List<Float> priceValues = new ArrayList<Float>(askPrices.get(typeString));
 	
 	return createChart(priceValues, typeString);
     }
@@ -581,7 +592,7 @@ public class BasicAgent extends AgentImpl {
     private String createFlightPredictionChart(int auctionID, List<Float> predictions) {
 	String typeString = TACAgent.getAuctionTypeAsString(auctionID);
 	
-	List<Float> priceValues = new ArrayList<Float>(prices.get(typeString));
+	List<Float> priceValues = new ArrayList<Float>(askPrices.get(typeString));
 	float lastPriceValue = priceValues.get(priceValues.size() - 1);
 	for(int i=priceValues.size(); i<54; i++) {
 	    priceValues.add(lastPriceValue);
