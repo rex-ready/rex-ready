@@ -59,7 +59,7 @@ public class MiningAgent extends AgentImpl {
     public void quoteUpdated(Quote quote) {
 	int auctionID = quote.getAuction();
 //	if(agent.getAuctionCategory(auctionID) == TACAgent.CAT_ENTERTAINMENT) {
-	System.err.println(auctionID + " " + quote.getAskPrice() + " " + quote.getBidPrice());
+	System.out.println(auctionID + " " + quote.getAskPrice() + " " + quote.getBidPrice());
 //	}else{
 //	    System.err.println(auctionID + " " + quote.getAskPrice());
 //	}
