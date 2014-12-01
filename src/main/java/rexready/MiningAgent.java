@@ -1,4 +1,4 @@
-package rexready.rexminer;
+package rexready;
 
 import java.io.BufferedWriter;
 import java.io.File;
