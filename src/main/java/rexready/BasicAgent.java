@@ -185,7 +185,7 @@ public class BasicAgent extends AgentImpl {
 				List<Float> askPriceList = askPrices.get(TACAgent.getAuctionTypeAsString(i));
 				List<Float> bidPriceList = bidPrices.get(TACAgent.getAuctionTypeAsString(i));
 				if (TACAgent.getAuctionCategory(i) == TACAgent.CAT_FLIGHT) {
-					String url = createFlightPredictionChart(i, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(i)));
+					String url = createPredictionChart(i, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(i)), 54);
 					bwCharts.write(url);
 				} else {
 					bwCharts.write(createChart(i));
@@ -261,7 +261,7 @@ public class BasicAgent extends AgentImpl {
 			int flightGraphID = 0;
 			if (auctionID == flightGraphID) {
 				// String url = createFixedWidthChart(flightGraphID, 54);
-				String url = createFlightPredictionChart(flightGraphID, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)));
+				String url = createPredictionChart(flightGraphID, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)), 54);
 				Image image = null;
 				try {
 					URL imageLocation = new URL(url);
@@ -524,17 +524,17 @@ public class BasicAgent extends AgentImpl {
 		return url;
 	}
 
-	private String createFlightPredictionChart(int auctionID, List<Float> predictions) {
+	private String createPredictionChart(int auctionID, List<Float> predictions, int graphWidth) {
 		String typeString = TACAgent.getAuctionTypeAsString(auctionID);
 
 		List<Float> priceValues = new ArrayList<Float>(askPrices.get(typeString));
 		float lastPriceValue = priceValues.get(priceValues.size() - 1);
-		for (int i = priceValues.size(); i < 54; i++) {
+		for (int i = priceValues.size(); i < graphWidth; i++) {
 			priceValues.add(lastPriceValue);
 		}
 		List<Float> predictionList = new ArrayList<Float>(predictions);
 		float lastPredictionValue = predictionList.get(predictionList.size() - 1);
-		for (int i = predictionList.size(); i < 54; i++) {
+		for (int i = predictionList.size(); i < graphWidth; i++) {
 			predictionList.add(lastPredictionValue);
 		}
 
