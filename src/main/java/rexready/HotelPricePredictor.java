@@ -2,15 +2,15 @@ package rexready;
 
 public class HotelPricePredictor {
 	public static final int T = 54;
-	public static final float[] deltaValues = new float[3];
+	public static final float[] deltaValues = {12, 20, 27};
 
 	public float[] deltas = new float[8];
 	public float[] previousPrices = new float[8];
 	public float[] currentPrices = new float[8];
 	public boolean[] initialized = new boolean[8];
 	public int[] closed = new int[8];
-	public Plateaus priceSizePlateaus = new Plateaus(0, 0, 0, 0);
-	public Plateaus priceDifferencePlateaus = new Plateaus(0, 0, 0, 0);
+	public Plateaus priceSizePlateaus = new Plateaus(40, 60, 100, 140);
+	public Plateaus priceDifferencePlateaus = new Plateaus(10, 15, 25, 30);
 
 	public class Plateaus {
 		public float lowMax;
