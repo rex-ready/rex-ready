@@ -140,8 +140,6 @@ public class BasicAgent extends AgentImpl {
 		new Thread(new Runnable() {
 			public void run() {
 				while (agent.getGameTime() < 65000) {
-					int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
-					hotelPredictor.updateDeltas(t);
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {
@@ -149,6 +147,12 @@ public class BasicAgent extends AgentImpl {
 					}
 				}
 				while (agent.getGameTimeLeft() > 0) {
+					int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
+					hotelPredictor.updateDeltas(t);
+					System.err.format("First: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[0], hotelPredictor.currentPrices[0], hotelPredictor.deltas[0], hotelPredictor.previousPrices[4], hotelPredictor.currentPrices[4], hotelPredictor.deltas[4]);
+					System.err.format("second: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[1], hotelPredictor.currentPrices[1], hotelPredictor.deltas[1], hotelPredictor.previousPrices[5], hotelPredictor.currentPrices[5], hotelPredictor.deltas[5]);
+					System.err.format("Third: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[2], hotelPredictor.currentPrices[2], hotelPredictor.deltas[2], hotelPredictor.previousPrices[6], hotelPredictor.currentPrices[6], hotelPredictor.deltas[6]);
+					System.err.format("Fourth: %f, %f, %f Counterpart: %f, %f, %f\n\n" , hotelPredictor.previousPrices[3], hotelPredictor.currentPrices[3], hotelPredictor.deltas[3], hotelPredictor.previousPrices[7], hotelPredictor.currentPrices[7], hotelPredictor.deltas[7]);
 					try {
 						Thread.sleep(60000);
 					} catch (InterruptedException e) {
@@ -284,7 +288,7 @@ public class BasicAgent extends AgentImpl {
 				hotelPredictor.previousPrices[hotelID] = hotelPredictor.currentPrices[hotelID];
 			}
 			hotelPredictor.currentPrices[hotelID] = quote.getAskPrice();
-
+			
 			int alloc = agent.getAllocation(auctionID); // Number of bids
 														// allocated
 			int hypotheticalQuantityWon = quote.getHQW();
