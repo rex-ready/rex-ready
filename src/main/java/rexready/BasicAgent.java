@@ -453,7 +453,7 @@ public class BasicAgent extends AgentImpl {
 	 * @return [0] = Arrival, [1] = Departure.
 	 */
 	private int[] pickFlightDates(ClientPreferences preferences) {
-		int[] ret = { preferences.getArrival(), preferences.getDeparture() };
+		int[] ret = { preferences.arrival, preferences.departure };
 		return ret;
 	}
 
