@@ -573,9 +573,8 @@ public class BasicAgent extends AgentImpl {
 			priceValues.add(firstPriceValue);
 		}
 		List<Float> predictionList = new ArrayList<Float>();
-		float firstPredictionValue = predictions.get(predictions.size() - 1);
 		for(int i = 0; i <= missedPointCount; i++){
-			predictionList.add(firstPredictionValue);
+			predictionList.add(firstPriceValue);
 		}
 				
 		priceValues.addAll(askPrices.get(typeString));
@@ -598,8 +597,6 @@ public class BasicAgent extends AgentImpl {
 		chart.setSize(550, 400);
 		chart.setTitle(typeString, Color.WHITE, 14);
 		if(missedPointCount > 0) {
-			System.err.println(missedPointCount);
-			System.err.println(maxDataPointCount);
 			double r = (1.0 * missedPointCount/maxDataPointCount);
 			chart.addVerticalRangeMarker(0, 100.0*r, Color.DARKSLATEGRAY);
 		}
