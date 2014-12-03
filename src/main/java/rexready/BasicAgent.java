@@ -135,29 +135,58 @@ public class BasicAgent extends AgentImpl {
 				}
 			}
 		}).start();
-
+		
 		// hotel price prediction
 		new Thread(new Runnable() {
 			public void run() {
-				while (agent.getGameTime() < 65000) {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+				DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
+				Date date = new Date();
+				File hotelPredictionFile = new File(dateFormat.format(date) + "hotelPredictions.txt");
+				try {
+					if (!hotelPredictionFile.exists()) {
+						hotelPredictionFile.createNewFile();
 					}
-				}
-				while (agent.getGameTimeLeft() > 0) {
-					int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
-					hotelPredictor.updateDeltas(t);
-					System.err.format("First: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[0], hotelPredictor.currentPrices[0], hotelPredictor.deltas[0], hotelPredictor.previousPrices[4], hotelPredictor.currentPrices[4], hotelPredictor.deltas[4]);
-					System.err.format("second: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[1], hotelPredictor.currentPrices[1], hotelPredictor.deltas[1], hotelPredictor.previousPrices[5], hotelPredictor.currentPrices[5], hotelPredictor.deltas[5]);
-					System.err.format("Third: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[2], hotelPredictor.currentPrices[2], hotelPredictor.deltas[2], hotelPredictor.previousPrices[6], hotelPredictor.currentPrices[6], hotelPredictor.deltas[6]);
-					System.err.format("Fourth: %f, %f, %f Counterpart: %f, %f, %f\n\n" , hotelPredictor.previousPrices[3], hotelPredictor.currentPrices[3], hotelPredictor.deltas[3], hotelPredictor.previousPrices[7], hotelPredictor.currentPrices[7], hotelPredictor.deltas[7]);
-					try {
-						Thread.sleep(60000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+					FileWriter fwHotels = new FileWriter(hotelPredictionFile.getAbsoluteFile());
+					BufferedWriter bwHotels = new BufferedWriter(fwHotels);
+				
+					while (agent.getGameTime() < 65000) {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
+					while (agent.getGameTimeLeft() > 0) {
+						int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
+						hotelPredictor.updateDeltas(t);
+						String firstString = String.format("First: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[0], hotelPredictor.currentPrices[0], hotelPredictor.deltas[0], hotelPredictor.previousPrices[4], hotelPredictor.currentPrices[4], hotelPredictor.deltas[4]);
+						String secondString = String.format("Second: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[1], hotelPredictor.currentPrices[1], hotelPredictor.deltas[1], hotelPredictor.previousPrices[5], hotelPredictor.currentPrices[5], hotelPredictor.deltas[5]);
+						String thirdString = String.format("Third: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[2], hotelPredictor.currentPrices[2], hotelPredictor.deltas[2], hotelPredictor.previousPrices[6], hotelPredictor.currentPrices[6], hotelPredictor.deltas[6]);
+						String fourthString = String.format("Fourth: %f, %f, %f Counterpart: %f, %f, %f\n\n" , hotelPredictor.previousPrices[3], hotelPredictor.currentPrices[3], hotelPredictor.deltas[3], hotelPredictor.previousPrices[7], hotelPredictor.currentPrices[7], hotelPredictor.deltas[7]);
+//						System.err.println(firstString);
+//						System.err.println(secondString);
+//						System.err.println(thirdString);
+//						System.err.println(fourthString);
+						bwHotels.write(firstString);
+						bwHotels.newLine();
+						bwHotels.write(secondString);
+						bwHotels.newLine();
+						bwHotels.write(thirdString);
+						bwHotels.newLine();
+						bwHotels.write(fourthString);
+						bwHotels.newLine();
+						bwHotels.write("-----");
+						bwHotels.newLine();
+						bwHotels.flush();
+						try {
+							Thread.sleep(60000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+					bwHotels.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}).start();
