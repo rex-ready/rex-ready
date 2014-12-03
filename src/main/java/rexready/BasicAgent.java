@@ -218,7 +218,9 @@ public class BasicAgent extends AgentImpl {
 				List<Float> askPriceList = askPrices.get(TACAgent.getAuctionTypeAsString(i));
 				List<Float> bidPriceList = bidPrices.get(TACAgent.getAuctionTypeAsString(i));
 				if (TACAgent.getAuctionCategory(i) == TACAgent.CAT_FLIGHT) {
-					String url = createPredictionChart(i, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(i)), 54);
+					long gameTimePast = agent.getGameLength() - agent.getGameTimeLeft();
+					int flightDataPointsPast = (int) (gameTimePast / 10000);
+					String url = createPredictionChart(i, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(i)), 54, flightDataPointsPast);
 					bwCharts.write(url);
 				} else {
 					bwCharts.write(createChart(i));
@@ -293,8 +295,11 @@ public class BasicAgent extends AgentImpl {
 
 			int flightGraphID = 0;
 			if (auctionID == flightGraphID) {
-				// String url = createFixedWidthChart(flightGraphID, 54);
-				String url = createPredictionChart(flightGraphID, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)), 54);
+				long gameTimePast = agent.getGameLength() - agent.getGameTimeLeft();
+				int flightDataPointsPast = (int) Math.ceil(gameTimePast / 10000);
+//				System.err.println(agent.getGameTimeLeft() + " " + flightDataPointsPast);
+				
+				String url = createPredictionChart(flightGraphID, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)), 54, flightDataPointsPast);
 				Image image = null;
 				try {
 					URL imageLocation = new URL(url);
@@ -557,17 +562,30 @@ public class BasicAgent extends AgentImpl {
 		return url;
 	}
 
-	private String createPredictionChart(int auctionID, List<Float> predictions, int graphWidth) {
+	private String createPredictionChart(int auctionID, List<Float> predictions, int maxDataPointCount, int pastPointCount) {
 		String typeString = TACAgent.getAuctionTypeAsString(auctionID);
-
-		List<Float> priceValues = new ArrayList<Float>(askPrices.get(typeString));
+		
+		int missedPointCount = (pastPointCount - askPrices.get(typeString).size());
+		
+		List<Float> priceValues = new ArrayList<Float>();
+		float firstPriceValue = askPrices.get(typeString).get(0);
+		for(int i = 0; i <= missedPointCount; i++){
+			priceValues.add(firstPriceValue);
+		}
+		List<Float> predictionList = new ArrayList<Float>();
+		float firstPredictionValue = predictions.get(predictions.size() - 1);
+		for(int i = 0; i <= missedPointCount; i++){
+			predictionList.add(firstPredictionValue);
+		}
+				
+		priceValues.addAll(askPrices.get(typeString));
 		float lastPriceValue = priceValues.get(priceValues.size() - 1);
-		for (int i = priceValues.size(); i < graphWidth; i++) {
+		for (int i = priceValues.size(); i < maxDataPointCount; i++) {
 			priceValues.add(lastPriceValue);
 		}
-		List<Float> predictionList = new ArrayList<Float>(predictions);
+		predictionList.addAll(predictions);
 		float lastPredictionValue = predictionList.get(predictionList.size() - 1);
-		for (int i = predictionList.size(); i < graphWidth; i++) {
+		for (int i = predictionList.size(); i < maxDataPointCount; i++) {
 			predictionList.add(lastPredictionValue);
 		}
 
@@ -579,8 +597,15 @@ public class BasicAgent extends AgentImpl {
 		LineChart chart = GCharts.newLineChart(priceLine, predictionLine);
 		chart.setSize(550, 400);
 		chart.setTitle(typeString, Color.WHITE, 14);
-		chart.setGrid(10, 10, 3, 2);
-
+		if(missedPointCount > 0) {
+			System.err.println(missedPointCount);
+			System.err.println(maxDataPointCount);
+			double r = (1.0 * missedPointCount/maxDataPointCount);
+			chart.addVerticalRangeMarker(0, 100.0*r, Color.DARKSLATEGRAY);
+		}
+		double gr = 100.0 * (5.0 / maxDataPointCount);
+		chart.setGrid(gr, 10.0, 3, 2);
+		
 		// Defining axis info and styles
 		chart.addXAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, priceValues.size()));
 		chart.addYAxisLabels(AxisLabelsFactory.newNumericRangeAxisLabels(0, 1000));
