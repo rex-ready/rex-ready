@@ -18,7 +18,7 @@ public class Optimiser {
 		
 		while (true) {
 			Strategy newStrategy = new Strategy(strategy);
-			newStrategy.mutate(0.1f);
+			newStrategy.mutate(0.2f);
 			if (newStrategy.getUtility() > strategy.getUtility()) {
 				strategy = newStrategy;
 				System.out.println(generation + "," + strategy.getUtility());
