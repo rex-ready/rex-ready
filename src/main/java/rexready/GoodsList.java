@@ -5,11 +5,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class ShoppingList {
+public class GoodsList {
 	
 	private Map<Good, Integer> goodAmounts = new EnumMap<>(Good.class);
 	
-	public ShoppingList() {
+	public GoodsList() {
 		for (Good good : Good.values()) {
 			goodAmounts.put(good, 0);
 		}
@@ -26,7 +26,7 @@ public class ShoppingList {
 		goodAmounts.put(good, amount);
 	}
 	
-	public void add(ShoppingList other) {
+	public void add(GoodsList other) {
 		for (Good good : Good.values()) {
 			setAmount(good, getAmount(good) + other.getAmount(good));
 		}

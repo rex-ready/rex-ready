@@ -102,8 +102,8 @@ public class Package {
 		}
 	}
 
-	public ShoppingList getShoppingList() {
-		ShoppingList result = new ShoppingList();
+	public GoodsList getShoppingList() {
+		GoodsList result = new GoodsList();
 
 		if (arrivalDate == 1) result.setAmount(Good.INFLIGHT_1, 1);
 		if (arrivalDate == 2) result.setAmount(Good.INFLIGHT_2, 1);
