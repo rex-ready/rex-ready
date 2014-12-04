@@ -46,4 +46,12 @@ public class Strategy {
 		return ToStringBuilder.reflectionToString(this);
 	}
 	
+	public ShoppingList getShoppingList() {
+		ShoppingList result = new ShoppingList();
+		for (Package pkg : packages.values()) {
+			result.add(pkg.getShoppingList());
+		}
+		return result;
+	}
+	
 }
