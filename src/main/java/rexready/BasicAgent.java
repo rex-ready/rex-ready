@@ -206,7 +206,7 @@ public class BasicAgent extends AgentImpl {
 		askPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
 		bidPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getBidPrice());
 
-		if (auctionCategory == TACAgent.CAT_FLIGHT) {
+		if (auctionCategory == TACAgent.CAT_FLIGHT && agent.getGameTime() >= 10000) {
 			int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
 			int flightID = auctionID;
 			float currentFlightPrice = quote.getAskPrice();
@@ -223,8 +223,8 @@ public class BasicAgent extends AgentImpl {
 //			float threshold = 80.f;
 			//Dynamic threshold
 			float maxThreshold = 100.f;
-			float minThreshold = 20.f;
-			float threshold = (agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold);
+			float minThreshold = 30.f;
+			float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
 //			System.err.println("Dynamic Threshold at time " + agent.getGameTime() + " = " + threshold);
 			
 			int alloc = agent.getAllocation(auctionID);
@@ -241,7 +241,7 @@ public class BasicAgent extends AgentImpl {
 					bid.addBidPoint(diff, bidPrice);
 					agent.submitBid(bid);
 				}
-			}		
+			}
 			
 			predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(currentPredictedFlightMin);
 
