@@ -107,10 +107,6 @@ public class BasicAgent extends AgentImpl {
 						String secondString = String.format("Second: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[1], hotelPredictor.currentPrices[1], hotelPredictor.deltas[1], hotelPredictor.previousPrices[5], hotelPredictor.currentPrices[5], hotelPredictor.deltas[5]);
 						String thirdString = String.format("Third: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[2], hotelPredictor.currentPrices[2], hotelPredictor.deltas[2], hotelPredictor.previousPrices[6], hotelPredictor.currentPrices[6], hotelPredictor.deltas[6]);
 						String fourthString = String.format("Fourth: %f, %f, %f Counterpart: %f, %f, %f\n\n" , hotelPredictor.previousPrices[3], hotelPredictor.currentPrices[3], hotelPredictor.deltas[3], hotelPredictor.previousPrices[7], hotelPredictor.currentPrices[7], hotelPredictor.deltas[7]);
-//						System.err.println(firstString);
-//						System.err.println(secondString);
-//						System.err.println(thirdString);
-//						System.err.println(fourthString);
 						bwHotels.write(firstString);
 						bwHotels.newLine();
 						bwHotels.write(secondString);
@@ -232,10 +228,6 @@ public class BasicAgent extends AgentImpl {
 			int probablyOwnedTickets = agent.getProbablyOwn(auctionID);
 			
 			int diff = alloc - ownedTickets - probablyOwnedTickets;
-			System.err.println("Owned tickets " + ownedTickets);
-			System.err.println("Probably owned tickets " + probablyOwnedTickets);
-			System.err.println("Allocated tickets " + alloc);
-			System.err.println("-----");
 			
 			if((currentFlightPrice-currentPredictedFlightMin) < threshold) {
 				if(diff > 0) {
