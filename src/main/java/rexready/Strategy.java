@@ -3,6 +3,8 @@ package rexready;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class Strategy {
 	
 	private final Map<ClientPreferences, Package> packages = new HashMap<>();
@@ -36,6 +38,11 @@ public class Strategy {
 		for (Package pkg : packages.values()) {
 			pkg.mutate(mutationRate);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 	
 }

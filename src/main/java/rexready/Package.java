@@ -7,6 +7,7 @@ import java.util.Random;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class Package {
 	
@@ -99,6 +100,11 @@ public class Package {
 			entertainmentTypes.add(null);
 			setEntertainment(day, entertainmentTypes.get(r.nextInt(entertainmentTypes.size())));
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 	
 }
