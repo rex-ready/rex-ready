@@ -80,62 +80,6 @@ public class BasicAgent extends AgentImpl {
 		graphLabel = new JLabel();
 		graphFrame.add(graphLabel);
 
-		final int bidInterval = 1000;
-		// Each bid interval:
-		// Flights - Update bids if price near minimum.
-		// Hotels - Update bids if near the end of the minute.
-		// Entertainment - Update bids immediately.
-		// Flights
-		new Thread(new Runnable() {
-			public void run() {
-				while (agent.getGameTimeLeft() > 0) {
-					// If price is near its' predicted minimum
-					// Update bids
-					try {
-						Thread.sleep(bidInterval);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}).start();
-
-		// Hotels
-		new Thread(new Runnable() {
-			public void run() {
-				boolean hotelsUpdated = false;
-				while (agent.getGameTimeLeft() > 0) {
-					// If in the last 10 seconds of a bidding cycle
-					if ((agent.getGameTime() % 60000) > 50000) {
-						if (hotelsUpdated) {
-							continue;
-						}
-						// Update hotel bids
-						hotelsUpdated = true;
-					} else {
-						hotelsUpdated = false;
-					}
-					try {
-						Thread.sleep(bidInterval);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}).start();
-
-		// Entertainment
-		new Thread(new Runnable() {
-			public void run() {
-				// Update bids
-				try {
-					Thread.sleep(bidInterval);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
-		
 		// hotel price prediction
 		new Thread(new Runnable() {
 			public void run() {
@@ -270,28 +214,40 @@ public class BasicAgent extends AgentImpl {
 		if (auctionCategory == TACAgent.CAT_FLIGHT) {
 			int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
 			int flightID = auctionID;
+			float currentFlightPrice = quote.getAskPrice();
 			if (flightPredictor.previousPrices[flightID] == 0) {
-				flightPredictor.previousPrices[flightID] = quote.getAskPrice();
+				flightPredictor.previousPrices[flightID] = currentFlightPrice;
 			} else {
 				flightPredictor.previousPrices[flightID] = flightPredictor.currentPrices[flightID];
 			}
-			flightPredictor.currentPrices[flightID] = quote.getAskPrice();
+			flightPredictor.currentPrices[flightID] = currentFlightPrice;
 			flightPredictor.updateProbabilityDistribution(flightID, t);
-			float predictedMinPrice = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
-			// System.err.println("UPDATED FLIGHT");
+			float currentPredictedFlightMin = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
+			
+			//Static threshold
+			float threshold = 80.f;
+			
 			int alloc = agent.getAllocation(auctionID);
 			int ownedTickets = agent.getOwn(auctionID);
-			int allocDiff = alloc - ownedTickets;
-			if (allocDiff > 0) {
-				Bid bid = new Bid(auctionID);
-				bidValues[auctionID] = updateFlightPrice(allocDiff, quote);
-				// System.err.println("Trying to bid at: " +
-				// bidValues[auctionID]);
-				bid.addBidPoint(allocDiff, bidValues[auctionID]);
-				agent.submitBid(bid);
-			}
-
-			predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(predictedMinPrice);
+			int probablyOwnedTickets = agent.getProbablyOwn(auctionID);
+			
+			int diff = alloc - ownedTickets - probablyOwnedTickets;
+			System.err.println("Owned tickets " + ownedTickets);
+			System.err.println("Probably owned tickets " + probablyOwnedTickets);
+			System.err.println("Allocated tickets " + alloc);
+			System.err.println("-----");
+			
+			if((currentFlightPrice-currentPredictedFlightMin) < threshold) {
+				if(diff > 0) {
+					float bidPrice = currentFlightPrice + 50;
+					System.err.println("Bid on flight " + auctionID + " for " + currentFlightPrice);
+					Bid bid = new Bid(auctionID);
+					bid.addBidPoint(diff, bidPrice);
+					agent.submitBid(bid);
+				}
+			}		
+			
+			predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(currentPredictedFlightMin);
 
 			int flightGraphID = 0;
 			if (auctionID == flightGraphID) {
@@ -462,21 +418,28 @@ public class BasicAgent extends AgentImpl {
 			int amountRequired = agent.getAllocation(i) - agent.getOwn(i);
 
 			int bidValue = 0;
+			Bid bid;
 			switch (TACAgent.getAuctionCategory(i)) {
 			case TACAgent.CAT_FLIGHT:
 				bidValue = calculateFlightBidValue();
 				break;
 			case TACAgent.CAT_HOTEL:
 				bidValue = calculateHotelBidValue();
+				bid = new Bid(i);
+				bid.addBidPoint(amountRequired, bidValue);
+				agent.submitBid(bid);
 				break;
 			case TACAgent.CAT_ENTERTAINMENT:
 				bidValue = calculateEntertainmentBidValue();
+				bid = new Bid(i);
+				bid.addBidPoint(amountRequired, bidValue);
+				agent.submitBid(bid);
 				break;
 			}
 
-			Bid bid = new Bid(i);
-			bid.addBidPoint(amountRequired, bidValue);
-			agent.submitBid(bid);
+//			Bid bid = new Bid(i);
+//			bid.addBidPoint(amountRequired, bidValue);
+//			agent.submitBid(bid);
 		}
 	}
 
