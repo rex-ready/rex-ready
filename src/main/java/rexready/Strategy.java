@@ -34,6 +34,10 @@ public class Strategy {
 		}
 		return result;
 	}
+
+	public float getScore(PriceData prices) {
+		return getUtility() - getShoppingList().getPrice(prices);
+	}
 	
 	public void mutate(float mutationRate) {
 		for (Package pkg : packages.values()) {
