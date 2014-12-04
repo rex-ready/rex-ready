@@ -1,13 +1,14 @@
 package rexready;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class Strategy {
 	
-	private final Map<ClientPreferences, Package> packages = new HashMap<>();
+	private final Map<ClientPreferences, Package> packages = new LinkedHashMap<>();
 	
 	public Strategy() {
 	}
