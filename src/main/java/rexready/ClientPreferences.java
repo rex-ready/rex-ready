@@ -29,8 +29,8 @@ public class ClientPreferences {
 		int hotelBonus = pkg.isGoodHotel() ? hotelValue : 0;
 		int funBonus = 0;
 		if (pkg.contains(EntertainmentType.ALLIGATOR_WRESTLING)) funBonus += e1Value;
-		if (pkg.contains(EntertainmentType.AMUSEMENT)) funBonus += e1Value;
-		if (pkg.contains(EntertainmentType.MUSEUM)) funBonus += e1Value;
+		if (pkg.contains(EntertainmentType.AMUSEMENT)) funBonus += e2Value;
+		if (pkg.contains(EntertainmentType.MUSEUM)) funBonus += e3Value;
 		return 1000 - travelPenalty + hotelBonus + funBonus;
 	}
 	
