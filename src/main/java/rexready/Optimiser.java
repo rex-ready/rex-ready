@@ -1,11 +1,11 @@
 package rexready;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Optimiser {
 	
-	private List<ClientPreferences> clients = new ArrayList<ClientPreferences>();
+	private Set<ClientPreferences> clients = new HashSet<ClientPreferences>();
 	
 	public void addClient(ClientPreferences client) {
 		clients.add(client);
