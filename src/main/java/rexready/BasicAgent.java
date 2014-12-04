@@ -158,8 +158,7 @@ public class BasicAgent extends AgentImpl {
 				List<Float> askPriceList = askPrices.get(TACAgent.getAuctionTypeAsString(i));
 				List<Float> bidPriceList = bidPrices.get(TACAgent.getAuctionTypeAsString(i));
 				if (TACAgent.getAuctionCategory(i) == TACAgent.CAT_FLIGHT) {
-					long gameTimePast = agent.getGameLength() - agent.getGameTimeLeft();
-					int flightDataPointsPast = (int) (gameTimePast / 10000);
+					int flightDataPointsPast = (int) (agent.getGameTime() / 10000);
 					String url = createPredictionChart(i, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(i)), 54, flightDataPointsPast);
 					bwCharts.write(url);
 				} else {
@@ -221,7 +220,12 @@ public class BasicAgent extends AgentImpl {
 			float currentPredictedFlightMin = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
 			
 			//Static threshold
-			float threshold = 80.f;
+//			float threshold = 80.f;
+			//Dynamic threshold
+			float maxThreshold = 100.f;
+			float minThreshold = 20.f;
+			float threshold = (agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold);
+//			System.err.println("Dynamic Threshold at time " + agent.getGameTime() + " = " + threshold);
 			
 			int alloc = agent.getAllocation(auctionID);
 			int ownedTickets = agent.getOwn(auctionID);
@@ -243,8 +247,7 @@ public class BasicAgent extends AgentImpl {
 
 			int flightGraphID = 0;
 			if (auctionID == flightGraphID) {
-				long gameTimePast = agent.getGameLength() - agent.getGameTimeLeft();
-				int flightDataPointsPast = (int) Math.ceil(gameTimePast / 10000);
+				int flightDataPointsPast = (int) Math.ceil(agent.getGameTime() / 10000);
 //				System.err.println(agent.getGameTimeLeft() + " " + flightDataPointsPast);
 				
 				String url = createPredictionChart(flightGraphID, predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)), 54, flightDataPointsPast);
