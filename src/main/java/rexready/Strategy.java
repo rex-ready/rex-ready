@@ -49,8 +49,8 @@ public class Strategy {
 		return ToStringBuilder.reflectionToString(this);
 	}
 	
-	public ShoppingList getShoppingList() {
-		ShoppingList result = new ShoppingList();
+	public GoodsList getShoppingList() {
+		GoodsList result = new GoodsList();
 		for (Package pkg : packages.values()) {
 			result.add(pkg.getShoppingList());
 		}
