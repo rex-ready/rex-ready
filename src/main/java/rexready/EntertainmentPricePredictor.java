@@ -7,7 +7,6 @@ public class EntertainmentPricePredictor {
 	public float[] deltas = new float[12];
 	public float[] previousPrices = new float[12];
 	public float[] currentPrices = new float[12];
-	public boolean[] initialized = new boolean[12];
 	public Plateaus priceSizePlateaus = new Plateaus(40, 60, 100, 140);
 	public Plateaus priceDifferencePlateaus = new Plateaus(-20, -5, 5, 20);
 	public float[] previousOtherAverage = new float[12];
@@ -18,7 +17,9 @@ public class EntertainmentPricePredictor {
 		for (int i = 0; i < 12; i++) {
 			deltas[i] = updateDeltaForAuction(i, t);
 		}
-
+		for (int i = 0; i < 12; i++) {
+			previousPrices[i] = currentPrices[i];
+		}
 	}
 
 	public float updateDeltaForAuction(int auctionID, int t) {

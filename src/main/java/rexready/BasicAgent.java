@@ -307,12 +307,6 @@ public class BasicAgent extends AgentImpl {
 		} else if (auctionCategory == TACAgent.CAT_ENTERTAINMENT) {
 			// System.err.println("UPDATED ENTERTAINMENT");
 			int entertainmentID = auctionID - 16;
-			if (entertainmentPredictor.initialized[entertainmentID] == false) {
-				entertainmentPredictor.previousPrices[entertainmentID] = quote.getAskPrice();
-				entertainmentPredictor.initialized[entertainmentID] = true;
-			} else {
-				entertainmentPredictor.previousPrices[entertainmentID] = entertainmentPredictor.currentPrices[entertainmentID];
-			}
 			entertainmentPredictor.currentPrices[entertainmentID] = quote.getAskPrice();
 			
 			int alloc = agent.getAllocation(auctionID);
