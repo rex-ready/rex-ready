@@ -34,8 +34,10 @@ public class Strategy {
 		return result;
 	}
 
-	public float getScore(PriceData prices) {
-		return getUtility() - getShoppingList().getPrice(prices);
+	public float getScore(PriceData prices, GoodsList ownedGoods) {
+		GoodsList shoppingList = getShoppingList();
+		shoppingList.subtract(ownedGoods);
+		return getUtility() - shoppingList.getPrice(prices);
 	}
 	
 	public void mutate(float mutationRate) {

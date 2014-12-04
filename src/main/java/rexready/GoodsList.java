@@ -32,6 +32,12 @@ public class GoodsList {
 		}
 	}
 	
+	public void subtract(GoodsList other) {
+		for (Good good : Good.values()) {
+			setAmount(good, Math.max(getAmount(good) - other.getAmount(good), 0));
+		}
+	}
+	
 	public float getPrice(PriceData prices) {
 		float result = 0.f;
 		for (Good good : Good.values()) {
