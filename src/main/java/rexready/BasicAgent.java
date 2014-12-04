@@ -85,7 +85,7 @@ public class BasicAgent extends AgentImpl {
 			public void run() {
 				DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
 				Date date = new Date();
-				File hotelPredictionFile = new File(dateFormat.format(date) + "hotelPredictions.txt");
+				File hotelPredictionFile = new File("data\\" + dateFormat.format(date) + "hotelPredictions.txt");
 				try {
 					if (!hotelPredictionFile.exists()) {
 						hotelPredictionFile.createNewFile();
@@ -145,11 +145,11 @@ public class BasicAgent extends AgentImpl {
 			DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
 			Date date = new Date();
 
-			File chartsFile = new File(dateFormat.format(date) + "charts.txt");
+			File chartsFile = new File("data\\" + dateFormat.format(date) + "charts.txt");
 			if (!chartsFile.exists()) {
 				chartsFile.createNewFile();
 			}
-			File priceFile = new File(dateFormat.format(date) + "prices.txt");
+			File priceFile = new File("data\\" + dateFormat.format(date) + "prices.txt");
 			if (!priceFile.exists()) {
 				priceFile.createNewFile();
 			}
