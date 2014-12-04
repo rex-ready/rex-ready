@@ -1,20 +1,42 @@
 package rexready;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Optimiser {
 	
-	public static void main(String[] args) {
-		int generation = 0;
+	private List<ClientPreferences> clients = new ArrayList<ClientPreferences>();
+	
+	public void addClient(ClientPreferences client) {
+		clients.add(client);
+	}
+	
+	public Strategy optimise(PriceData prices, int numGenerations, float mutationRate) {
 		Strategy strategy = new Strategy();
-		strategy.setPackage(new ClientPreferences(3, 4, 81, 65, 87, 119), new Package());
-		strategy.setPackage(new ClientPreferences(1, 2, 91, 139, 23, 107), new Package());
-		strategy.setPackage(new ClientPreferences(1, 2, 69, 177, 22, 189), new Package());
-		strategy.setPackage(new ClientPreferences(3, 5, 68, 14, 175, 25), new Package());
-		strategy.setPackage(new ClientPreferences(1, 5, 113, 3, 104, 101), new Package());
-		strategy.setPackage(new ClientPreferences(2, 3, 144, 153, 154, 108), new Package());
-		strategy.setPackage(new ClientPreferences(1, 4, 74, 25, 38, 66), new Package());
-		strategy.setPackage(new ClientPreferences(4, 5, 87, 111, 16, 130), new Package());
+		for (ClientPreferences client : clients) {
+			strategy.setPackage(client, new Package());
+		}
+		for (int i = 0; i < numGenerations; ++i) {
+			Strategy newStrategy = new Strategy(strategy);
+			newStrategy.mutate(mutationRate);
+			if (newStrategy.getScore(prices) > strategy.getScore(prices)) {
+				strategy = newStrategy;
+			}
+		}
+		return strategy;
+	}
+	
+	public static void main(String[] args) {
+		Optimiser optimiser = new Optimiser();
+		optimiser.addClient(new ClientPreferences(3, 4, 81, 65, 87, 119));
+		optimiser.addClient(new ClientPreferences(1, 2, 91, 139, 23, 107));
+		optimiser.addClient(new ClientPreferences(1, 2, 69, 177, 22, 189));
+		optimiser.addClient(new ClientPreferences(3, 5, 68, 14, 175, 25));
+		optimiser.addClient(new ClientPreferences(1, 5, 113, 3, 104, 101));
+		optimiser.addClient(new ClientPreferences(2, 3, 144, 153, 154, 108));
+		optimiser.addClient(new ClientPreferences(1, 4, 74, 25, 38, 66));
+		optimiser.addClient(new ClientPreferences(4, 5, 87, 111, 16, 130));
 		
-		System.out.println("Generation,Utility");
 		PriceData prices = new PriceData();
 		prices.setPrice(Good.INFLIGHT_1, 323.f);
 		prices.setPrice(Good.INFLIGHT_2, 408.f);
@@ -45,15 +67,12 @@ public class Optimiser {
 		prices.setPrice(Good.MUSEUM_3, 66.3018f);
 		prices.setPrice(Good.MUSEUM_4, 60.2232f);
 		
-		while (true) {
-			Strategy newStrategy = new Strategy(strategy);
-			newStrategy.mutate(0.2f);
-			if (newStrategy.getScore(prices) > strategy.getScore(prices)) {
-				strategy = newStrategy;
-				System.out.println(generation + "," + strategy.getUtility());
-			}
-			++generation;
-		}
+		long startTime = System.currentTimeMillis();
+		
+		Strategy strategy = optimiser.optimise(prices, 200000, 0.2f);
+		System.out.println(strategy);
+		System.out.println("Score: " + strategy.getScore(prices));
+		System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 }
