@@ -1,5 +1,7 @@
 package rexready;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class ClientPreferences {
 
 	public final int arrival, departure;
@@ -17,11 +19,7 @@ public class ClientPreferences {
 
 	@Override
 	public String toString() {
-		String s = "Arrival: " + arrival;
-		s += "\nDeparture: " + departure;
-		s += "\nHotel Bonus: " + hotelValue;
-		s += "Entertainment Bonuses: " + e1Value + ", " + e2Value + ", " + e3Value;
-		return s;
+		return ToStringBuilder.reflectionToString(this);
 	}
 	
 	public int getUtility(Package pkg) {
