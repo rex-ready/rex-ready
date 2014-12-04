@@ -101,6 +101,50 @@ public class Package {
 			setEntertainment(day, entertainmentTypes.get(r.nextInt(entertainmentTypes.size())));
 		}
 	}
+
+	public ShoppingList getShoppingList() {
+		ShoppingList result = new ShoppingList();
+
+		if (arrivalDate == 1) result.setAmount(Good.INFLIGHT_1, 1);
+		if (arrivalDate == 2) result.setAmount(Good.INFLIGHT_2, 1);
+		if (arrivalDate == 3) result.setAmount(Good.INFLIGHT_3, 1);
+		if (arrivalDate == 4) result.setAmount(Good.INFLIGHT_4, 1);
+
+		if (departureDate == 2) result.setAmount(Good.OUTFLIGHT_2, 1);
+		if (departureDate == 3) result.setAmount(Good.OUTFLIGHT_3, 1);
+		if (departureDate == 4) result.setAmount(Good.OUTFLIGHT_4, 1);
+		if (departureDate == 5) result.setAmount(Good.OUTFLIGHT_5, 1);
+		
+		if (goodHotel) {
+			if (arrivalDate <= 1 && departureDate > 1) result.setAmount(Good.GOOD_HOTEL_1, 1);
+			if (arrivalDate <= 2 && departureDate > 2) result.setAmount(Good.GOOD_HOTEL_2, 1);
+			if (arrivalDate <= 3 && departureDate > 3) result.setAmount(Good.GOOD_HOTEL_3, 1);
+			if (arrivalDate <= 4 && departureDate > 4) result.setAmount(Good.GOOD_HOTEL_4, 1);
+		}
+		else {
+			if (arrivalDate <= 1 && departureDate > 1) result.setAmount(Good.CHEAP_HOTEL_1, 1);
+			if (arrivalDate <= 2 && departureDate > 2) result.setAmount(Good.CHEAP_HOTEL_2, 1);
+			if (arrivalDate <= 3 && departureDate > 3) result.setAmount(Good.CHEAP_HOTEL_3, 1);
+			if (arrivalDate <= 4 && departureDate > 4) result.setAmount(Good.CHEAP_HOTEL_4, 1);
+		}
+		
+		if (entertainment.get(1) == EntertainmentType.ALLIGATOR_WRESTLING) result.setAmount(Good.ALLIGATOR_1, 1);
+		if (entertainment.get(2) == EntertainmentType.ALLIGATOR_WRESTLING) result.setAmount(Good.ALLIGATOR_2, 1);
+		if (entertainment.get(3) == EntertainmentType.ALLIGATOR_WRESTLING) result.setAmount(Good.ALLIGATOR_3, 1);
+		if (entertainment.get(4) == EntertainmentType.ALLIGATOR_WRESTLING) result.setAmount(Good.ALLIGATOR_4, 1);
+
+		if (entertainment.get(1) == EntertainmentType.AMUSEMENT) result.setAmount(Good.AMUSEMENT_1, 1);
+		if (entertainment.get(2) == EntertainmentType.AMUSEMENT) result.setAmount(Good.AMUSEMENT_2, 1);
+		if (entertainment.get(3) == EntertainmentType.AMUSEMENT) result.setAmount(Good.AMUSEMENT_3, 1);
+		if (entertainment.get(4) == EntertainmentType.AMUSEMENT) result.setAmount(Good.AMUSEMENT_4, 1);
+
+		if (entertainment.get(1) == EntertainmentType.MUSEUM) result.setAmount(Good.MUSEUM_1, 1);
+		if (entertainment.get(2) == EntertainmentType.MUSEUM) result.setAmount(Good.MUSEUM_2, 1);
+		if (entertainment.get(3) == EntertainmentType.MUSEUM) result.setAmount(Good.MUSEUM_3, 1);
+		if (entertainment.get(4) == EntertainmentType.MUSEUM) result.setAmount(Good.MUSEUM_4, 1);
+		
+		return result;
+	}
 	
 	@Override
 	public String toString() {
