@@ -11,12 +11,13 @@ public class Optimiser {
 		clients.add(client);
 	}
 	
-	public Strategy optimise(PriceData prices, GoodsList ownedGoods, int numGenerations, float mutationRate) {
+	public Strategy optimise(PriceData prices, GoodsList ownedGoods, long timeout, float mutationRate) {
+		long startTime = System.currentTimeMillis();
 		Strategy strategy = new Strategy();
 		for (ClientPreferences client : clients) {
 			strategy.setPackage(client, new Package());
 		}
-		for (int i = 0; i < numGenerations; ++i) {
+		while (System.currentTimeMillis() < startTime + timeout) {
 			Strategy newStrategy = new Strategy(strategy);
 			newStrategy.mutate(mutationRate);
 			if (newStrategy.getScore(prices, ownedGoods) > strategy.getScore(prices, ownedGoods)) {
@@ -71,7 +72,7 @@ public class Optimiser {
 		
 		long startTime = System.currentTimeMillis();
 		
-		Strategy strategy = optimiser.optimise(prices, ownedGoods, 200000, 0.2f);
+		Strategy strategy = optimiser.optimise(prices, ownedGoods, 1000, 0.2f);
 		System.out.println(strategy);
 		System.out.println("Score: " + strategy.getScore(prices, ownedGoods));
 		System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + "ms");
