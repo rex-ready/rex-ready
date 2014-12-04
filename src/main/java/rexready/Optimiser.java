@@ -15,7 +15,7 @@ public class Optimiser {
 		long startTime = System.currentTimeMillis();
 		Strategy strategy = new Strategy();
 		for (ClientPreferences client : clients) {
-			strategy.setPackage(client, new Package());
+			strategy.setPackage(client, new Package(client.arrival, client.departure, client.hotelValue > 100));
 		}
 		while (System.currentTimeMillis() < startTime + timeout) {
 			Strategy newStrategy = new Strategy(strategy);
