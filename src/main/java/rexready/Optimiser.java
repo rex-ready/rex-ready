@@ -11,7 +11,7 @@ public class Optimiser {
 		clients.add(client);
 	}
 	
-	public Strategy optimise(PriceData prices, int numGenerations, float mutationRate) {
+	public Strategy optimise(PriceData prices, GoodsList ownedGoods, int numGenerations, float mutationRate) {
 		Strategy strategy = new Strategy();
 		for (ClientPreferences client : clients) {
 			strategy.setPackage(client, new Package());
@@ -19,7 +19,7 @@ public class Optimiser {
 		for (int i = 0; i < numGenerations; ++i) {
 			Strategy newStrategy = new Strategy(strategy);
 			newStrategy.mutate(mutationRate);
-			if (newStrategy.getScore(prices) > strategy.getScore(prices)) {
+			if (newStrategy.getScore(prices, ownedGoods) > strategy.getScore(prices, ownedGoods)) {
 				strategy = newStrategy;
 			}
 		}
@@ -67,11 +67,13 @@ public class Optimiser {
 		prices.setPrice(Good.MUSEUM_3, 66.3018f);
 		prices.setPrice(Good.MUSEUM_4, 60.2232f);
 		
+		GoodsList ownedGoods = new GoodsList();
+		
 		long startTime = System.currentTimeMillis();
 		
-		Strategy strategy = optimiser.optimise(prices, 200000, 0.2f);
+		Strategy strategy = optimiser.optimise(prices, ownedGoods, 200000, 0.2f);
 		System.out.println(strategy);
-		System.out.println("Score: " + strategy.getScore(prices));
+		System.out.println("Score: " + strategy.getScore(prices, ownedGoods));
 		System.out.println("Time taken: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
