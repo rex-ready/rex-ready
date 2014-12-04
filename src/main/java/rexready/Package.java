@@ -1,5 +1,10 @@
 package rexready;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
@@ -75,6 +80,25 @@ public class Package {
 	
 	public boolean contains(EntertainmentType type) {
 		return entertainment.containsValue(type);
+	}
+	
+	public void mutate(float mutationRate) {
+		Random r = new Random();
+		if (r.nextFloat() < mutationRate) {
+			setArrivalDate(r.nextInt(getDepartureDate() - 1) + 1);
+		}
+		if (r.nextFloat() < mutationRate) {
+			setDepartureDate(r.nextInt(5 - getArrivalDate()) + getArrivalDate() + 1);
+		}
+		if (r.nextFloat() < mutationRate) {
+			setGoodHotel(r.nextBoolean());
+		}
+		if (r.nextFloat() < mutationRate) {
+			int day = r.nextInt(getDepartureDate() - getArrivalDate()) + getArrivalDate();
+			List<EntertainmentType> entertainmentTypes = new ArrayList<>(Arrays.asList(EntertainmentType.values()));
+			entertainmentTypes.add(null);
+			setEntertainment(day, entertainmentTypes.get(r.nextInt(entertainmentTypes.size())));
+		}
 	}
 	
 }
