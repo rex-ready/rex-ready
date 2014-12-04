@@ -23,4 +23,15 @@ public class ClientPreferences {
 		s += "Entertainment Bonuses: " + e1Value + ", " + e2Value + ", " + e3Value;
 		return s;
 	}
+	
+	public int getUtility(Package pkg) {
+		int travelPenalty = 100 * (Math.abs(pkg.getArrivalDate() - arrival) + Math.abs(pkg.getDepartureDate() - departure));
+		int hotelBonus = pkg.isGoodHotel() ? hotelValue : 0;
+		int funBonus = 0;
+		if (pkg.contains(EntertainmentType.ALLIGATOR_WRESTLING)) funBonus += e1Value;
+		if (pkg.contains(EntertainmentType.AMUSEMENT)) funBonus += e1Value;
+		if (pkg.contains(EntertainmentType.MUSEUM)) funBonus += e1Value;
+		return 1000 - travelPenalty + hotelBonus + funBonus;
+	}
+	
 }
