@@ -31,6 +31,14 @@ public class ShoppingList {
 			setAmount(good, getAmount(good) + other.getAmount(good));
 		}
 	}
+	
+	public float getPrice(PriceData prices) {
+		float result = 0.f;
+		for (Good good : Good.values()) {
+			result += getAmount(good) * prices.getPrice(good);
+		}
+		return result;
+	}
 
 	@Override
 	public String toString() {
