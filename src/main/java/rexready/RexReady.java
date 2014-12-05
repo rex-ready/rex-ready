@@ -203,9 +203,11 @@ public class RexReady extends AgentImpl {
 			}
 			System.out.println("Projected score: " + score + " - " + totalCost + " = " + (score - totalCost));
 			agent.clearAllocation();
-			// TODO: Clear old bids
 			for (Good good : Good.values()) {
 				agent.setAllocation(good.ordinal(), strategy.getShoppingList().getAmount(good));
+				if (TACAgent.getAuctionCategory(good.ordinal()) != TACAgent.CAT_HOTEL) {
+					agent.submitBid(new Bid(good.ordinal()));
+				}
 				System.out.println("Allocating " + strategy.getShoppingList().getAmount(good) + " " + good.name() + "s");
 			}
 			System.out.println("Bid now");
