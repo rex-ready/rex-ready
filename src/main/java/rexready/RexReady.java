@@ -139,7 +139,13 @@ public class RexReady extends AgentImpl {
 				
 		switch (TACAgent.getAuctionCategory(quote.getAuction())) {
 		case TACAgent.CAT_FLIGHT:
-			flightPredictor.previousPrices[quote.getAuction()] = flightPredictor.currentPrices[quote.getAuction()];
+			if (flightPredictor.previousPrices[quote.getAuction()] == 0) {
+				flightPredictor.previousPrices[quote.getAuction()] = quote.getAskPrice();
+			}
+			else
+			{
+				flightPredictor.previousPrices[quote.getAuction()] = flightPredictor.currentPrices[quote.getAuction()];
+			}
 			flightPredictor.currentPrices[quote.getAuction()] = quote.getAskPrice();
 			flightPredictor.updateProbabilityDistribution(quote.getAuction(), t);
 			
@@ -147,11 +153,16 @@ public class RexReady extends AgentImpl {
 			predictedMinimumFlightPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(flightPredictor.getProbableMinimumPrice(auctionID, t, agent.getQuote(auctionID).getAskPrice()));
 			break;
 		case TACAgent.CAT_HOTEL:
-			hotelPredictor.previousPrices[quote.getAuction() - 8] = hotelPredictor.currentPrices[quote.getAuction() - 8];
-			hotelPredictor.currentPrices[quote.getAuction() - 8] = quote.getAskPrice();
+			int hotelID = quote.getAuction() - 8;
+			if (hotelPredictor.initialized[hotelID] == false) {
+				hotelPredictor.previousPrices[hotelID] = quote.getAskPrice();
+				hotelPredictor.initialized[hotelID] = true;
+			} else {
+				hotelPredictor.previousPrices[hotelID] = hotelPredictor.currentPrices[hotelID];
+			}
+			hotelPredictor.currentPrices[hotelID] = quote.getAskPrice();
 			break;
 		case TACAgent.CAT_ENTERTAINMENT:
-			entertainmentPredictor.previousPrices[quote.getAuction() - 16] = entertainmentPredictor.currentPrices[quote.getAuction() - 16];
 			entertainmentPredictor.currentPrices[quote.getAuction() - 16] = quote.getAskPrice();
 			break;
 		}
