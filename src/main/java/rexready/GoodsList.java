@@ -42,6 +42,15 @@ public class GoodsList {
 		}
 		return result;
 	}
+	
+	public boolean isFeasible(PriceData priceData) {
+		for (Good good : Good.values()) {
+			if (getAmount(good) > 0 && !priceData.isAvailable(good)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 	@Override
 	public String toString() {

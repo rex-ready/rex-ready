@@ -173,6 +173,7 @@ public class RexReady extends AgentImpl {
 			entertainmentPredictor.updateDeltas(t);
 			PriceData priceData = new PriceData();
 			for (int i = 0; i < TACAgent.getAuctionNo(); ++i) {
+				priceData.setAvailable(Good.values()[i], !agent.getQuote(i).isAuctionClosed());
 				switch (TACAgent.getAuctionCategory(i)) {
 				case TACAgent.CAT_FLIGHT:
 					priceData.setPrice(Good.values()[i], flightPredictor.getProbableMinimumPrice(i, (int) (agent.getGameTime() / 10000.f), agent.getQuote(i).getAskPrice()));
@@ -184,6 +185,9 @@ public class RexReady extends AgentImpl {
 				case TACAgent.CAT_ENTERTAINMENT:
 					System.out.println("Delta for entertainment " + i + "=" + entertainmentPredictor.deltas[i - 16]);
 					priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice() + entertainmentPredictor.deltas[i - 16]);
+					if (agent.getQuote(i).getAskPrice() == 0.f) {
+						priceData.setAvailable(Good.values()[i], false);
+					}
 					break;
 				}
 			}

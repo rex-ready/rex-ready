@@ -44,7 +44,12 @@ public class Strategy {
 	public float getScore(PriceData prices, GoodsList ownedGoods) {
 		GoodsList shoppingList = getShoppingList();
 		shoppingList.subtract(ownedGoods);
-		return getUtility() - shoppingList.getPrice(prices);
+		if (!shoppingList.isFeasible(prices)) {
+			return 0.f;
+		}
+		else {
+			return getUtility() - shoppingList.getPrice(prices);
+		}
 	}
 	
 	public void mutate(Random random, float mutationRate) {
