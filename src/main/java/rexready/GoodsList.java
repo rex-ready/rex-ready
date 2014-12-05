@@ -38,7 +38,9 @@ public class GoodsList {
 	public float getPrice(PriceData prices) {
 		float result = 0.f;
 		for (Good good : Good.values()) {
-			result += getAmount(good) * prices.getPrice(good);
+			if (getAmount(good) > 0) {
+				result += getAmount(good) * prices.getPrice(good);
+			}
 		}
 		return result;
 	}
