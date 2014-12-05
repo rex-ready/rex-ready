@@ -144,7 +144,7 @@ public class RexReady extends AgentImpl {
 						agent.submitBid(bid);
 					}
 					if (diff < 0) {
-						float sellPrice = agent.getQuote(i).getAskPrice() - 10;
+						float sellPrice = Math.max(agent.getQuote(i).getAskPrice() - 10, 60);
 						System.out.println("Selling unneeded entertainment " + i + " for " + sellPrice);
 						Bid bid = new Bid(i);
 						bid.addBidPoint(diff, sellPrice);
