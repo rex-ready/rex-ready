@@ -80,7 +80,12 @@ public class Package {
 		if (date < arrivalDate || date >= departureDate) {
 			throw new IllegalArgumentException("date is out of range");
 		}
-		entertainment.put(date, type);
+		if (type == null) {
+			entertainment.remove(date);
+		}
+		else {
+			entertainment.put(date, type);
+		}
 	}
 	
 	public boolean contains(EntertainmentType type) {
