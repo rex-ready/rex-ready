@@ -10,7 +10,7 @@ public class Optimiser {
 	
 	public void addClient(ClientPreferences client) {
 		clients.add(client);
-		strategy.setPackage(client, new Package(client.arrival, client.departure, client.hotelValue > 100));
+		strategy.setPackage(client, new Package(client));
 	}
 	
 	public Strategy optimise(PriceData prices, GoodsList ownedGoods, long timeout, float mutationRate) {

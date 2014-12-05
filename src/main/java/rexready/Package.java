@@ -19,6 +19,10 @@ public class Package {
 		this(1, 5, false);
 	}
 	
+	public Package(ClientPreferences client) {
+		this(client.arrival, client.departure, client.hotelValue > 100);
+	}
+	
 	public Package(int arrivalDate, int departureDate, boolean goodHotel) {
 		setDepartureDate(departureDate);
 		setArrivalDate(arrivalDate);
