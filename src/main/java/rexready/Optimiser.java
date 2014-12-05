@@ -1,6 +1,7 @@
 package rexready;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public class Optimiser {
@@ -14,10 +15,11 @@ public class Optimiser {
 	}
 	
 	public Strategy optimise(PriceData prices, GoodsList ownedGoods, long timeout, float mutationRate) {
+		Random r = new Random();
 		long startTime = System.currentTimeMillis();
 		while (System.currentTimeMillis() < startTime + timeout) {
 			Strategy newStrategy = new Strategy(strategy);
-			newStrategy.mutate(mutationRate);
+			newStrategy.mutate(r, mutationRate);
 			if (newStrategy.getScore(prices, ownedGoods) > strategy.getScore(prices, ownedGoods)) {
 				strategy = newStrategy;
 			}

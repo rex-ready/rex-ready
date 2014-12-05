@@ -2,6 +2,7 @@ package rexready;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -40,9 +41,21 @@ public class Strategy {
 		return getUtility() - shoppingList.getPrice(prices);
 	}
 	
-	public void mutate(float mutationRate) {
-		for (Package pkg : packages.values()) {
-			pkg.mutate(mutationRate);
+	public void mutate(Random random, float mutationRate) {
+		for (Map.Entry<ClientPreferences, Package> entry : packages.entrySet()) {
+			if (entry.getValue() == null) {
+				if (random.nextFloat() < mutationRate) {
+					entry.setValue(new Package(entry.getKey()));
+				}
+			}
+			else {
+				if (random.nextFloat() < mutationRate) {
+					entry.setValue(null);
+				}
+				else {
+					entry.getValue().mutate(random, mutationRate);
+				}
+			}
 		}
 	}
 	

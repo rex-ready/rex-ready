@@ -87,8 +87,7 @@ public class Package {
 		return entertainment.containsValue(type);
 	}
 	
-	public void mutate(float mutationRate) {
-		Random r = new Random();
+	public void mutate(Random r, float mutationRate) {
 		if (r.nextFloat() < mutationRate) {
 			setArrivalDate(r.nextInt(getDepartureDate() - 1) + 1);
 		}
