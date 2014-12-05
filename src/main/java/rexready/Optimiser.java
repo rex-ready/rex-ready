@@ -6,17 +6,15 @@ import java.util.Set;
 public class Optimiser {
 	
 	private Set<ClientPreferences> clients = new HashSet<ClientPreferences>();
+	private Strategy strategy = new Strategy();
 	
 	public void addClient(ClientPreferences client) {
 		clients.add(client);
+		strategy.setPackage(client, new Package(client.arrival, client.departure, client.hotelValue > 100));
 	}
 	
 	public Strategy optimise(PriceData prices, GoodsList ownedGoods, long timeout, float mutationRate) {
 		long startTime = System.currentTimeMillis();
-		Strategy strategy = new Strategy();
-		for (ClientPreferences client : clients) {
-			strategy.setPackage(client, new Package(client.arrival, client.departure, client.hotelValue > 100));
-		}
 		while (System.currentTimeMillis() < startTime + timeout) {
 			Strategy newStrategy = new Strategy(strategy);
 			newStrategy.mutate(mutationRate);
