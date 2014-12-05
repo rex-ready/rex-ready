@@ -81,11 +81,11 @@ public class RexReady extends AgentImpl {
 			DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
 			Date date = new Date();
 
-			File chartsFile = new File("data\\" + dateFormat.format(date) + "charts.txt");
+			File chartsFile = new File("data/" + dateFormat.format(date) + "charts.txt");
 			if (!chartsFile.exists()) {
 				chartsFile.createNewFile();
 			}
-			File priceFile = new File("data\\" + dateFormat.format(date) + "prices.txt");
+			File priceFile = new File("data/" + dateFormat.format(date) + "prices.txt");
 			if (!priceFile.exists()) {
 				priceFile.createNewFile();
 			}
