@@ -17,7 +17,11 @@ public class Strategy {
 		this();
 		
 		for (Map.Entry<ClientPreferences, Package> entry : old.packages.entrySet()) {
-			packages.put(entry.getKey(), new Package(entry.getValue()));
+			Package pkg = null;
+			if (entry.getValue() != null) {
+				pkg = new Package(entry.getValue());
+			}
+			packages.put(entry.getKey(), pkg);
 		}
 	}
 
@@ -30,7 +34,9 @@ public class Strategy {
 		for (Map.Entry<ClientPreferences, Package> entries : packages.entrySet()) {
 			ClientPreferences client = entries.getKey();
 			Package pkg = entries.getValue();
-			result += client.getUtility(pkg);
+			if (pkg != null) {
+				result += client.getUtility(pkg);
+			}
 		}
 		return result;
 	}
@@ -67,7 +73,9 @@ public class Strategy {
 	public GoodsList getShoppingList() {
 		GoodsList result = new GoodsList();
 		for (Package pkg : packages.values()) {
-			result.add(pkg.getShoppingList());
+			if (pkg != null) {
+				result.add(pkg.getShoppingList());
+			}
 		}
 		return result;
 	}
