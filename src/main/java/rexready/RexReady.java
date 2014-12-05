@@ -105,66 +105,68 @@ public class RexReady extends AgentImpl {
 			}
 			System.out.println("Bid now");
 			
-			// FLIGHT BIDDING
-			float maxThreshold = 100.f;
-			float minThreshold = 30.f;
-			float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
-			
-			for (int i = 0; i < 8; ++i) {
-				int alloc = agent.getAllocation(i);
-				int ownedTickets = agent.getOwn(i);
-				int probablyOwnedTickets = agent.getProbablyOwn(i);
+			if (agent.getGameTime() > 30000) {
+				// FLIGHT BIDDING
+				float maxThreshold = 100.f;
+				float minThreshold = 30.f;
+				float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
 				
-				int diff = alloc - ownedTickets - probablyOwnedTickets;
-				
-				if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < threshold) {
-					if(diff > 0) {
-						float bidPrice = agent.getQuote(i).getAskPrice() + 50;
-						System.out.println("Bid on flight " + i + " for " + bidPrice);
-						Bid bid = new Bid(i);
-						bid.addBidPoint(diff, bidPrice);
-						agent.submitBid(bid);
+				for (int i = 0; i < 8; ++i) {
+					int alloc = agent.getAllocation(i);
+					int ownedTickets = agent.getOwn(i);
+					int probablyOwnedTickets = agent.getProbablyOwn(i);
+					
+					int diff = alloc - ownedTickets - probablyOwnedTickets;
+					
+					if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < threshold) {
+						if(diff > 0) {
+							float bidPrice = agent.getQuote(i).getAskPrice() + 50;
+							System.out.println("Bid on flight " + i + " for " + bidPrice);
+							Bid bid = new Bid(i);
+							bid.addBidPoint(diff, bidPrice);
+							agent.submitBid(bid);
+						}
 					}
 				}
-			}
-			// END FLIGHT BIDDING
-			
-			// ENTERTAINMENT BIDDING
-			for (int i = 16; i < 28; ++i) {
-				int alloc = agent.getAllocation(i);
-				int ownedTickets = agent.getOwn(i);
-				int probablyOwnedTickets = agent.getProbablyOwn(i);
-				int diff = alloc - ownedTickets - probablyOwnedTickets;
-				if (diff > 0) {
-					float bidPrice = agent.getQuote(i).getAskPrice();
-					System.out.println("Bid on entertainment " + i + " for " + bidPrice);
-					Bid bid = new Bid(i);
-					bid.addBidPoint(diff, bidPrice);
-					agent.submitBid(bid);
-				}
-				if (diff < 0) {
-					float sellPrice = agent.getQuote(i).getAskPrice() - 10;
-					System.out.println("Selling unneeded entertainment " + i + " for " + sellPrice);
-					Bid bid = new Bid(i);
-					bid.addBidPoint(diff, sellPrice);
-					agent.submitBid(bid);
-				}
-			}
-			// END ENTERTAINMENT BIDDING
-			
-			if (agent.getGameTime() % 60000 > 50000) {
-				System.out.println("Bid for hotels now");
-				for (int i = 8; i < 16; ++i) {
+				// END FLIGHT BIDDING
+				
+				// ENTERTAINMENT BIDDING
+				for (int i = 16; i < 28; ++i) {
 					int alloc = agent.getAllocation(i);
 					int ownedTickets = agent.getOwn(i);
 					int probablyOwnedTickets = agent.getProbablyOwn(i);
 					int diff = alloc - ownedTickets - probablyOwnedTickets;
 					if (diff > 0) {
-						float bidPrice = priceData.getPrice(Good.values()[i]);
-						System.out.println("Bid on hotel " + i + " for " + bidPrice);
+						float bidPrice = agent.getQuote(i).getAskPrice();
+						System.out.println("Bid on entertainment " + i + " for " + bidPrice);
 						Bid bid = new Bid(i);
 						bid.addBidPoint(diff, bidPrice);
 						agent.submitBid(bid);
+					}
+					if (diff < 0) {
+						float sellPrice = agent.getQuote(i).getAskPrice() - 10;
+						System.out.println("Selling unneeded entertainment " + i + " for " + sellPrice);
+						Bid bid = new Bid(i);
+						bid.addBidPoint(diff, sellPrice);
+						agent.submitBid(bid);
+					}
+				}
+				// END ENTERTAINMENT BIDDING
+				
+				if (agent.getGameTime() % 60000 > 50000) {
+					System.out.println("Bid for hotels now");
+					for (int i = 8; i < 16; ++i) {
+						int alloc = agent.getAllocation(i);
+						int ownedTickets = agent.getOwn(i);
+						int probablyOwnedTickets = agent.getProbablyOwn(i);
+						int diff = alloc - ownedTickets - probablyOwnedTickets;
+						if (diff > 0) {
+							float bidPrice = priceData.getPrice(Good.values()[i]);
+							System.out.println("Bid on hotel " + i + " for " + bidPrice);
+							Bid bid = new Bid(i);
+							bid.addBidPoint(diff, bidPrice);
+							agent.submitBid(bid);
+						}
 					}
 				}
 			}
