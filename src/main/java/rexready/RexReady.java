@@ -271,9 +271,9 @@ public class RexReady extends AgentImpl {
 						int diff = alloc - ownedTickets - probablyOwnedTickets;
 						if (diff > 0) {
 							float bidPrice = priceData.getPrice(Good.values()[i]);
-							System.out.println("Bid on hotel " + i + " for " + (bidPrice + 50));
+							System.out.println("Bid on hotel " + i + " for " + (bidPrice + 200));
 							Bid bid = new Bid(i);
-							bid.addBidPoint(diff, bidPrice + 50);
+							bid.addBidPoint(diff, bidPrice + 200);
 							agent.submitBid(bid);
 						}
 					}
