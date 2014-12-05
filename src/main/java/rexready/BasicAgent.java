@@ -59,6 +59,8 @@ public class BasicAgent extends AgentImpl {
 	private EntertainmentPricePredictor entertainmentPredictor = new EntertainmentPricePredictor();
 	
 	private BufferedWriter bwHotels;
+	
+	private long startTime;
 
 	@Override
 	protected void init(ArgEnumerator args) {
@@ -89,7 +91,8 @@ public class BasicAgent extends AgentImpl {
 
 	@Override
 	public void gameStarted() {
-		System.err.println("Game start");
+		System.err.println("Game start " + agent.getGameTime());
+		startTime = agent.getGameTime();
 
 		graphFrame = new JFrame();
 		graphFrame.setSize(600, 450);
@@ -188,7 +191,7 @@ public class BasicAgent extends AgentImpl {
 		askPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getAskPrice());
 		bidPrices.get(TACAgent.getAuctionTypeAsString(auctionID)).add(quote.getBidPrice());
 
-		if (auctionCategory == TACAgent.CAT_FLIGHT && agent.getGameTime() >= 10000) {
+		if (auctionCategory == TACAgent.CAT_FLIGHT) {
 			int t = (int) Math.ceil(agent.getGameTime() / 10000.0);
 			int flightID = auctionID;
 			float currentFlightPrice = quote.getAskPrice();
@@ -201,27 +204,29 @@ public class BasicAgent extends AgentImpl {
 			flightPredictor.updateProbabilityDistribution(flightID, t);
 			float currentPredictedFlightMin = flightPredictor.getProbableMinimumPrice(flightID, t, quote.getAskPrice());
 			
-			//Static threshold
-//			float threshold = 80.f;
-			//Dynamic threshold
-			float maxThreshold = 100.f;
-			float minThreshold = 30.f;
-			float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
-//			System.err.println("Dynamic Threshold at time " + agent.getGameTime() + " = " + threshold);
-			
-			int alloc = agent.getAllocation(auctionID);
-			int ownedTickets = agent.getOwn(auctionID);
-			int probablyOwnedTickets = agent.getProbablyOwn(auctionID);
-			
-			int diff = alloc - ownedTickets - probablyOwnedTickets;
-			
-			if((currentFlightPrice-currentPredictedFlightMin) < threshold) {
-				if(diff > 0) {
-					float bidPrice = currentFlightPrice + 50;
-					System.err.println("Bid on flight " + auctionID + " for " + currentFlightPrice);
-					Bid bid = new Bid(auctionID);
-					bid.addBidPoint(diff, bidPrice);
-					agent.submitBid(bid);
+			if(agent.getGameTime() >= (startTime + 10000)){
+				//Static threshold
+	//			float threshold = 80.f;
+				//Dynamic threshold
+				float maxThreshold = 100.f;
+				float minThreshold = 30.f;
+				float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
+	//			System.err.println("Dynamic Threshold at time " + agent.getGameTime() + " = " + threshold);
+				
+				int alloc = agent.getAllocation(auctionID);
+				int ownedTickets = agent.getOwn(auctionID);
+				int probablyOwnedTickets = agent.getProbablyOwn(auctionID);
+				
+				int diff = alloc - ownedTickets - probablyOwnedTickets;
+				
+				if((currentFlightPrice-currentPredictedFlightMin) < threshold) {
+					if(diff > 0) {
+						float bidPrice = currentFlightPrice + 50;
+						System.err.println("Bid on flight " + auctionID + " for " + currentFlightPrice);
+						Bid bid = new Bid(auctionID);
+						bid.addBidPoint(diff, bidPrice);
+						agent.submitBid(bid);
+					}
 				}
 			}
 			
