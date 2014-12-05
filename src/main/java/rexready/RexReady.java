@@ -168,12 +168,7 @@ public class RexReady extends AgentImpl {
 					break;
 				case TACAgent.CAT_HOTEL:
 					System.out.println("Delta for hotel " + i + "=" + hotelPredictor.deltas[i - 8]);
-					if (agent.getQuote(i).isAuctionClosed()) {
-						priceData.setPrice(Good.values()[i], Float.MAX_VALUE);
-					}
-					else {
-						priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice() + hotelPredictor.deltas[i - 8]);
-					}
+					priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice() + hotelPredictor.deltas[i - 8] * 2);
 					break;
 				case TACAgent.CAT_ENTERTAINMENT:
 					System.out.println("Delta for entertainment " + i + "=" + entertainmentPredictor.deltas[i - 16]);
