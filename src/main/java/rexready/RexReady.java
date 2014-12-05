@@ -196,7 +196,12 @@ public class RexReady extends AgentImpl {
 			}
 			Strategy strategy = optimiser.optimise(priceData, ownedGoods, 5000, 0.2f);
 			System.out.println(strategy);
-			System.out.println("Projected score: " + strategy.getScore(priceData, ownedGoods));
+			float score = strategy.getScore(priceData, ownedGoods);
+			float totalCost = 0.f;
+			for (int i = 0; i < TACAgent.getAuctionNo(); ++i) {
+				totalCost += agent.costs[i];
+			}
+			System.out.println("Projected score: " + score + " - " + totalCost + " = " + (score - totalCost));
 			agent.clearAllocation();
 			// TODO: Clear old bids
 			for (Good good : Good.values()) {

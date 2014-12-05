@@ -206,7 +206,7 @@ public class TACAgent implements Task, TACMessageReceiver {
   private int[] owns = new int[NO_AUCTIONS];
   private Bid[] bids = new Bid[NO_AUCTIONS];
   private Quote[] quotes = new Quote[NO_AUCTIONS];
-  private float[] costs = new float[NO_AUCTIONS];
+  public float[] costs = new float[NO_AUCTIONS];
 
   private long[] pendingQuotes = new long[NO_AUCTIONS];
 
