@@ -253,14 +253,14 @@ public class RexReady extends AgentImpl {
 					int ownedTickets = agent.getOwn(i);
 					int probablyOwnedTickets = agent.getProbablyOwn(i);
 					int diff = alloc - ownedTickets - probablyOwnedTickets;
-					if (diff > 0) {
+					if (agent.getGameTime() > 240000 && diff > 0) {
 						float bidPrice = Math.min(agent.getQuote(i).getAskPrice(), 200);
 						System.out.println("Bid on entertainment " + i + " for " + bidPrice);
 						Bid bid = new Bid(i);
 						bid.addBidPoint(diff, bidPrice);
 						agent.submitBid(bid);
 					}
-					if (diff < 0) {
+					if (agent.getGameTime() > 240000 && diff < 0) {
 						float sellPrice = Math.max(agent.getQuote(i).getAskPrice() - 10, 60);
 						System.out.println("Selling unneeded entertainment " + i + " for " + sellPrice);
 						Bid bid = new Bid(i);
