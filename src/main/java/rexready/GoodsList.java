@@ -20,9 +20,6 @@ public class GoodsList {
 	}
 	
 	public void setAmount(Good good, int amount) {
-		if (amount < 0) {
-			throw new IllegalArgumentException("amount is negative");
-		}
 		goodAmounts.put(good, amount);
 	}
 	
@@ -34,7 +31,7 @@ public class GoodsList {
 	
 	public void subtract(GoodsList other) {
 		for (Good good : Good.values()) {
-			setAmount(good, Math.max(getAmount(good) - other.getAmount(good), 0));
+			setAmount(good, getAmount(good) - other.getAmount(good));
 		}
 	}
 	
