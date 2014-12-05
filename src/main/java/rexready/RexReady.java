@@ -233,7 +233,7 @@ public class RexReady extends AgentImpl {
 					int probablyOwnedTickets = agent.getProbablyOwn(i);
 					int diff = alloc - ownedTickets - probablyOwnedTickets;
 					if (diff > 0) {
-						float bidPrice = agent.getQuote(i).getAskPrice();
+						float bidPrice = Math.min(agent.getQuote(i).getAskPrice(), 200);
 						System.out.println("Bid on entertainment " + i + " for " + bidPrice);
 						Bid bid = new Bid(i);
 						bid.addBidPoint(diff, bidPrice);
