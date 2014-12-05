@@ -201,24 +201,26 @@ public class RexReady extends AgentImpl {
 			
 			if (agent.getGameTime() > 30000) {
 				// FLIGHT BIDDING
-				float maxThreshold = 100.f;
-				float minThreshold = 30.f;
-				float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
-				
-				for (int i = 0; i < 8; ++i) {
-					int alloc = agent.getAllocation(i);
-					int ownedTickets = agent.getOwn(i);
-					int probablyOwnedTickets = agent.getProbablyOwn(i);
+				if (agent.getGameTime() > 240000) {
+					float maxThreshold = 100.f;
+					float minThreshold = 30.f;
+					float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
 					
-					int diff = alloc - ownedTickets - probablyOwnedTickets;
-					
-					if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < threshold) {
-						if(diff > 0) {
-							float bidPrice = agent.getQuote(i).getAskPrice() + 50;
-							System.out.println("Bid on flight " + i + " for " + bidPrice);
-							Bid bid = new Bid(i);
-							bid.addBidPoint(diff, bidPrice);
-							agent.submitBid(bid);
+					for (int i = 0; i < 8; ++i) {
+						int alloc = agent.getAllocation(i);
+						int ownedTickets = agent.getOwn(i);
+						int probablyOwnedTickets = agent.getProbablyOwn(i);
+						
+						int diff = alloc - ownedTickets - probablyOwnedTickets;
+						
+						if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < threshold) {
+							if(diff > 0) {
+								float bidPrice = agent.getQuote(i).getAskPrice() + 50;
+								System.out.println("Bid on flight " + i + " for " + bidPrice);
+								Bid bid = new Bid(i);
+								bid.addBidPoint(diff, bidPrice);
+								agent.submitBid(bid);
+							}
 						}
 					}
 				}
