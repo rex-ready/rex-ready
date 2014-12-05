@@ -43,8 +43,6 @@ public class RexReady extends AgentImpl {
 	private Map<String, List<Float>> predictedMinimumFlightPrices = new HashMap<String, List<Float>>();
 	private Map<String, List<Float>> bidPrices = new HashMap<String, List<Float>>();
 	
-	private BufferedWriter bwHotels;
-
 	@Override
 	protected void init(ArgEnumerator args) {
 		System.out.println("init");
@@ -124,7 +122,6 @@ public class RexReady extends AgentImpl {
 			}
 			bwCharts.close();
 			bwPrices.close();
-			bwHotels.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -161,26 +158,6 @@ public class RexReady extends AgentImpl {
 		
 		if (quote.getAuction() == 7) {
 			hotelPredictor.updateDeltas(t);
-			
-			String firstString = String.format("First: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[0], hotelPredictor.currentPrices[0], hotelPredictor.deltas[0], hotelPredictor.previousPrices[4], hotelPredictor.currentPrices[4], hotelPredictor.deltas[4]);
-			String secondString = String.format("Second: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[1], hotelPredictor.currentPrices[1], hotelPredictor.deltas[1], hotelPredictor.previousPrices[5], hotelPredictor.currentPrices[5], hotelPredictor.deltas[5]);
-			String thirdString = String.format("Third: %f, %f, %f Counterpart: %f, %f, %f\n" , hotelPredictor.previousPrices[2], hotelPredictor.currentPrices[2], hotelPredictor.deltas[2], hotelPredictor.previousPrices[6], hotelPredictor.currentPrices[6], hotelPredictor.deltas[6]);
-			String fourthString = String.format("Fourth: %f, %f, %f Counterpart: %f, %f, %f\n\n" , hotelPredictor.previousPrices[3], hotelPredictor.currentPrices[3], hotelPredictor.deltas[3], hotelPredictor.previousPrices[7], hotelPredictor.currentPrices[7], hotelPredictor.deltas[7]);
-			try {
-				bwHotels.write(firstString);
-				bwHotels.newLine();
-				bwHotels.write(secondString);
-				bwHotels.newLine();
-				bwHotels.write(thirdString);
-				bwHotels.newLine();
-				bwHotels.write(fourthString);
-				bwHotels.newLine();
-				bwHotels.write("-----");
-				bwHotels.newLine();
-				bwHotels.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 			
 			entertainmentPredictor.updateDeltas(t);
 			PriceData priceData = new PriceData();
