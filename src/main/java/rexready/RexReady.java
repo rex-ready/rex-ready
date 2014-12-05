@@ -192,7 +192,7 @@ public class RexReady extends AgentImpl {
 			}
 			GoodsList ownedGoods = new GoodsList();
 			for (Good good : Good.values()) {
-				ownedGoods.setAmount(good, agent.getOwn(good.ordinal()));
+				ownedGoods.setAmount(good, agent.getOwn(good.ordinal()) + agent.getProbablyOwn(good.ordinal()));
 			}
 			Strategy strategy = optimiser.optimise(priceData, ownedGoods, 5000, 0.2f);
 			System.out.println(strategy);
