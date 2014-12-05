@@ -102,11 +102,11 @@ public class Package {
 		if (r.nextFloat() < mutationRate) {
 			setGoodHotel(r.nextBoolean());
 		}
-		if (r.nextFloat() < mutationRate) {
-			int day = r.nextInt(getDepartureDate() - getArrivalDate()) + getArrivalDate();
-			List<EntertainmentType> entertainmentTypes = new ArrayList<>(Arrays.asList(EntertainmentType.values()));
-			entertainmentTypes.add(null);
-			setEntertainment(day, entertainmentTypes.get(r.nextInt(entertainmentTypes.size())));
+		for (int day = getArrivalDate(); day < getDepartureDate(); ++day) {
+			setEntertainment(day, null);
+			if (r.nextFloat() > 0.75f) {
+				setEntertainment(day, EntertainmentType.values()[r.nextInt(EntertainmentType.values().length)]);
+			}
 		}
 	}
 
