@@ -202,6 +202,7 @@ public class RexReady extends AgentImpl {
 				}
 				ownedGoods.setAmount(good, amount);
 			}
+			System.out.println("Running optimiser...");
 			Strategy strategy = optimiser.optimise(priceData, ownedGoods, 5000, 0.2f);
 			System.out.println(strategy);
 			float score = strategy.getScore(priceData, ownedGoods);
