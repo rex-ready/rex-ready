@@ -214,9 +214,6 @@ public class RexReady extends AgentImpl {
 			agent.clearAllocation();
 			for (Good good : Good.values()) {
 				agent.setAllocation(good.ordinal(), strategy.getShoppingList().getAmount(good));
-				if (TACAgent.getAuctionCategory(good.ordinal()) != TACAgent.CAT_HOTEL) {
-					agent.submitBid(new Bid(good.ordinal()));
-				}
 				System.out.println("Allocating " + strategy.getShoppingList().getAmount(good) + " " + good.name() + "s");
 			}
 			System.out.println("Bid now");
@@ -254,20 +251,18 @@ public class RexReady extends AgentImpl {
 					int ownedTickets = agent.getOwn(i);
 					int probablyOwnedTickets = agent.getProbablyOwn(i);
 					int diff = alloc - ownedTickets - probablyOwnedTickets;
+					Bid bid = new Bid(i);
 					if (agent.getGameTime() > 240000 && diff > 0) {
 						float bidPrice = Math.min(agent.getQuote(i).getAskPrice(), 200);
 						System.out.println("Bid on entertainment " + i + " for " + bidPrice);
-						Bid bid = new Bid(i);
 						bid.addBidPoint(diff, bidPrice);
-						agent.submitBid(bid);
 					}
 					if (agent.getGameTime() > 240000 && diff < 0) {
 						float sellPrice = Math.max(agent.getQuote(i).getAskPrice() - 10, 60);
 						System.out.println("Selling unneeded entertainment " + i + " for " + sellPrice);
-						Bid bid = new Bid(i);
 						bid.addBidPoint(diff, sellPrice);
-						agent.submitBid(bid);
 					}
+					agent.submitBid(bid);
 				}
 				// END ENTERTAINMENT BIDDING
 				
