@@ -69,6 +69,7 @@ public class EntertainmentPricePredictor {
 		float f = 1.7f;
 		//currently not considering c, may want to do so
 		
+		/*
 		//if p is not high and sp is high and sc is not negative, delta is positive
 		delta[2] += ((p[0] + p[1]) + sp[2] + (sc[1] + sc[2])) / 3.0;
 		//if p is not high and sp is high and sc is negative, delta is zero
@@ -90,6 +91,16 @@ public class EntertainmentPricePredictor {
 		delta[1] += (p[0] + op[0]) / 2.0;
 		delta[0] += (p[2] + (op[0] + op[1]) + (oc[0] + oc[1])) / 3.0;
 		delta[1] += (p[2] + op[2]) / 2.0;
+		*/
+
+		//if p is low, delta is positive
+		delta[2] += p[0];
+		
+		//if p is high, delta is negative
+		delta[0] += p[2];
+		
+		//if p is medium, delta is 0
+		delta[1] += p[1];
 
 		//normalize
 		float sum = 0;
