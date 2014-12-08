@@ -2,7 +2,7 @@ package rexready;
 
 public class HotelPricePredictor {
 	public static final int T = 54;
-	public static final float[] deltaValues = {8, 20, 33};
+	public static final float[] deltaValues = {10, 45, 100};
 
 	public float[] deltas = new float[8];
 	public float[] previousPrices = new float[8];
@@ -10,7 +10,7 @@ public class HotelPricePredictor {
 	public boolean[] initialized = new boolean[8];
 	public int[] closed = new int[8];
 	public Plateaus priceSizePlateaus = new Plateaus(40, 60, 100, 140);
-	public Plateaus priceDifferencePlateaus = new Plateaus(10, 15, 25, 30);
+	public Plateaus priceDifferencePlateaus = new Plateaus(15, 25, 60, 70);
 
 
 	public void updateDeltas(int t) {
