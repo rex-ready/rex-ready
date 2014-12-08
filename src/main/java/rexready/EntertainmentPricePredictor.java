@@ -2,13 +2,13 @@ package rexready;
 
 public class EntertainmentPricePredictor {
 	public static final int T = 54;
-	public static final float[] deltaValues = {-20, 0, 20};
+	public static final float[] deltaValues = {-7, 0, 100};
 
 	public float[] deltas = new float[12];
 	public float[] previousPrices = new float[12];
 	public float[] currentPrices = new float[12];
-	public Plateaus priceSizePlateaus = new Plateaus(40, 60, 100, 140);
-	public Plateaus priceDifferencePlateaus = new Plateaus(-20, -5, 5, 20);
+	public Plateaus priceSizePlateaus = new Plateaus(100, 115, 135, 150);
+	public Plateaus priceDifferencePlateaus = new Plateaus(-3, -1, 5, 30);
 	public float[] previousOtherAverage = new float[12];
 	public float[] previousSameAverage = new float[12];
 
