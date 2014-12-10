@@ -37,7 +37,7 @@ public class RexReady extends AgentImpl {
 	private FlightPricePredictor flightPredictor = new FlightPricePredictor();
 	private HotelPricePredictor hotelPredictor = new HotelPricePredictor();
 	private EntertainmentPricePredictor entertainmentPredictor = new EntertainmentPricePredictor();
-	private Optimiser optimiser = new Optimiser();
+	private Optimiser optimiser;
 	
 	private Map<String, List<Float>> askPrices = new HashMap<String, List<Float>>();
 	private Map<String, List<Float>> predictedMinimumFlightPrices = new HashMap<String, List<Float>>();
@@ -59,6 +59,7 @@ public class RexReady extends AgentImpl {
 	@Override
 	public void gameStarted() {
 		System.out.println("gameStarted");
+		optimiser = new Optimiser();
 		System.out.println("Client | Arrival Day | Departure Day | Hotel Value | Ent 1 | Ent 2 | Ent 3 \n");
 		for (int i = 0; i < 8; i++) {
 			int arrivalPreference = agent.getClientPreference(i, TACAgent.ARRIVAL);
