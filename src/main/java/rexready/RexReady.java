@@ -71,6 +71,13 @@ public class RexReady extends AgentImpl {
 			System.out.format("%6d | %11d | %13d | %11d | %5d | %5d | %5d\n", i, arrivalPreference, departurePreference, hotelValue, eValues[0], eValues[1], eValues[2]);
 			optimiser.addClient(new ClientPreferences(arrivalPreference, departurePreference, hotelValue, eValues[0], eValues[1], eValues[2]));
 		}
+		
+		// Place bids for 4 of every hotel room @ 5 each
+		for (int i = 8; i < 16; ++i) {
+			Bid bid = new Bid(i);
+			bid.addBidPoint(4, 5);
+			agent.submitBid(bid);
+		}
 	}
 
 	@Override
