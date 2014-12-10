@@ -218,7 +218,20 @@ public class RexReady extends AgentImpl {
 			}
 			System.out.println("Bid now");
 			
-			if (agent.getGameTime() > 30000) {
+			if (strategy.getScore(priceData, ownedGoods) < 500) {
+				System.out.println();
+				System.out.println();
+				System.out.println("***************************************");
+				System.out.println("***************************************");
+				System.out.println("*** WARNING: PROJECTED SCORE IS < 0 ***");
+				System.out.println("***   SKIPPING BIDDING FOR 1 TICK   ***");
+				System.out.println("***************************************");
+				System.out.println("***************************************");
+				System.out.println();
+				System.out.println();
+			}
+			
+			if (agent.getGameTime() > 30000 && strategy.getScore(priceData, ownedGoods) > 0) {
 				// FLIGHT BIDDING
 				if (agent.getGameTime() > 240000) {
 					float maxThreshold = 100.f;
