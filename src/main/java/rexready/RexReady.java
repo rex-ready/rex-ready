@@ -34,9 +34,9 @@ import se.sics.tac.util.ArgEnumerator;
 
 public class RexReady extends AgentImpl {
 	
-	private FlightPricePredictor flightPredictor = new FlightPricePredictor();
-	private HotelPricePredictor hotelPredictor = new HotelPricePredictor();
-	private EntertainmentPricePredictor entertainmentPredictor = new EntertainmentPricePredictor();
+	private FlightPricePredictor flightPredictor;
+	private HotelPricePredictor hotelPredictor;
+	private EntertainmentPricePredictor entertainmentPredictor;
 	private Optimiser optimiser;
 	
 	private Map<String, List<Float>> askPrices = new HashMap<String, List<Float>>();
@@ -46,6 +46,19 @@ public class RexReady extends AgentImpl {
 	@Override
 	protected void init(ArgEnumerator args) {
 		System.out.println("init");
+	}
+
+	@Override
+	public void gameStarted() {
+		System.out.println("gameStarted");
+		
+		optimiser = new Optimiser();
+		flightPredictor = new FlightPricePredictor();
+		hotelPredictor = new HotelPricePredictor();
+		entertainmentPredictor = new EntertainmentPricePredictor();
+		askPrices.clear();
+		predictedMinimumFlightPrices.clear();
+		bidPrices.clear();
 		
 		for (int i = 0; i < TACAgent.getAuctionNo(); i++) {
 			askPrices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
@@ -54,12 +67,7 @@ public class RexReady extends AgentImpl {
 				predictedMinimumFlightPrices.put(TACAgent.getAuctionTypeAsString(i), new ArrayList<Float>());
 			}
 		}
-	}
-
-	@Override
-	public void gameStarted() {
-		System.out.println("gameStarted");
-		optimiser = new Optimiser();
+		
 		System.out.println("Client | Arrival Day | Departure Day | Hotel Value | Ent 1 | Ent 2 | Ent 3 \n");
 		for (int i = 0; i < 8; i++) {
 			int arrivalPreference = agent.getClientPreference(i, TACAgent.ARRIVAL);
