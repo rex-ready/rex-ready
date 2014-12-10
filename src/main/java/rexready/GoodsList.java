@@ -31,7 +31,7 @@ public class GoodsList {
 	
 	public void subtract(GoodsList other) {
 		for (Good good : Good.values()) {
-			setAmount(good, getAmount(good) - other.getAmount(good));
+			setAmount(good, Math.max(getAmount(good) - other.getAmount(good), 0));
 		}
 	}
 	
