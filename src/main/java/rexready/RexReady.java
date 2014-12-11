@@ -214,7 +214,7 @@ public class RexReady extends AgentImpl {
 					priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice() + hotelPredictor.deltas[i - 8] * 2);
 					break;
 				case TACAgent.CAT_ENTERTAINMENT:
-					priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice() + entertainmentPredictor.deltas[i - 16]);
+					priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice());
 					if (agent.getQuote(i).getAskPrice() < 1.f) {
 						priceData.setAvailable(Good.values()[i], false);
 					}
