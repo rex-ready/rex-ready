@@ -308,7 +308,7 @@ public class RexReady extends AgentImpl {
 					agent.submitBid(bid);
 				}
 				// END ENTERTAINMENT BIDDING
-				
+				//HOTEL BIDDING
 				if (agent.getGameTime() % 60000 > 50000) {
 					for (int i = 8; i < 16; ++i) {
 						int alloc = agent.getAllocation(i);
@@ -323,6 +323,7 @@ public class RexReady extends AgentImpl {
 						}
 					}
 				}
+				//END HOTEL BIDDING
 			}
 		}
 	}
