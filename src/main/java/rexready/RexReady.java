@@ -308,16 +308,13 @@ public class RexReady extends AgentImpl {
 				if (agent.getGameTime() % 60000 > 50000) {
 					for (int i = 8; i < 16; ++i) {
 						if (!agent.getQuote(i).isAuctionClosed()) {
-							int alloc = Math.max(agent.getAllocation(i), agent.getProbablyOwn(i));
 							float bidPrice = priceData.getPrice(Good.values()[i]);
-							if(agent.getQuote(i).isAuctionClosed()) {
-								Bid bid = new Bid(i);
-								bid.addBidPoint(agent.getAllocation(i), bidPrice + 50);
-								if(agent.getAllocation(i) < agent.getProbablyOwn(i)) {
-									bid.addBidPoint(agent.getProbablyOwn(i) - agent.getAllocation(i), agent.getQuote(i).getAskPrice() + 1);
-								}
-								agent.submitBid(bid);
+							Bid bid = new Bid(i);
+							bid.addBidPoint(agent.getAllocation(i), bidPrice + 50);
+							if(agent.getAllocation(i) < agent.getProbablyOwn(i)) {
+								bid.addBidPoint(agent.getProbablyOwn(i) - agent.getAllocation(i), agent.getQuote(i).getAskPrice() + 1);
 							}
+							agent.submitBid(bid);
 						}
 					}
 				}
