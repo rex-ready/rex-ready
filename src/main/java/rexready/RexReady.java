@@ -282,8 +282,7 @@ public class RexReady extends AgentImpl {
 				for (int i = 16; i < 28; ++i) {
 					int alloc = agent.getAllocation(i);
 					int ownedTickets = agent.getOwn(i);
-					int probablyOwnedTickets = agent.getProbablyOwn(i);
-					int diff = alloc - ownedTickets - probablyOwnedTickets;
+					int diff = alloc - ownedTickets;
 					Bid bid = new Bid(i);
 					if (agent.getGameTime() > 240000 && diff > 0) {
 						float bidPrice = Math.min(agent.getQuote(i).getAskPrice(), 200);
