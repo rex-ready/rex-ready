@@ -19,9 +19,12 @@ public class Optimiser {
 		long startTime = System.currentTimeMillis();
 		while (System.currentTimeMillis() < startTime + timeout) {
 			Strategy newStrategy = new Strategy(strategy);
-			newStrategy.mutate(r, mutationRate);
-			if (newStrategy.getScore(prices, ownedGoods) > strategy.getScore(prices, ownedGoods)) {
-				strategy = newStrategy;
+			for (int i = 0; i < 10; ++i) {
+				newStrategy.mutate(r, mutationRate);
+				if (newStrategy.getScore(prices, ownedGoods) > strategy.getScore(prices, ownedGoods)) {
+					strategy = newStrategy;
+					break;
+				}
 			}
 		}
 		return strategy;
