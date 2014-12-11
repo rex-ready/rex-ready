@@ -263,19 +263,21 @@ public class RexReady extends AgentImpl {
 			
 			if (agent.getGameTime() > 30000 && strategy.getScore(priceData, ownedGoods) > 0) {
 				// FLIGHT BIDDING
-				for (int i = 0; i < 8; ++i) {
-					int alloc = agent.getAllocation(i);
-					int ownedTickets = agent.getOwn(i);
-					int probablyOwnedTickets = agent.getProbablyOwn(i);
-					
-					int diff = alloc - ownedTickets - probablyOwnedTickets;
-					
-					if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < 10 || agent.getGameTime() > 510000) {
-						if(diff > 0) {
-							float bidPrice = agent.getQuote(i).getAskPrice() + 50;
-							Bid bid = new Bid(i);
-							bid.addBidPoint(diff, bidPrice);
-							agent.submitBid(bid);
+				if (agent.getGameTime() > 240000) {
+					for (int i = 0; i < 8; ++i) {
+						int alloc = agent.getAllocation(i);
+						int ownedTickets = agent.getOwn(i);
+						int probablyOwnedTickets = agent.getProbablyOwn(i);
+						
+						int diff = alloc - ownedTickets - probablyOwnedTickets;
+						
+						if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < 10 || agent.getGameTime() > 510000) {
+							if(diff > 0) {
+								float bidPrice = agent.getQuote(i).getAskPrice() + 50;
+								Bid bid = new Bid(i);
+								bid.addBidPoint(diff, bidPrice);
+								agent.submitBid(bid);
+							}
 						}
 					}
 				}
