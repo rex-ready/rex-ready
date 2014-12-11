@@ -307,14 +307,11 @@ public class RexReady extends AgentImpl {
 				//HOTEL BIDDING
 				if (agent.getGameTime() % 60000 > 50000) {
 					for (int i = 8; i < 16; ++i) {
-						int alloc = agent.getAllocation(i);
-						int ownedTickets = agent.getOwn(i);
-						int probablyOwnedTickets = agent.getProbablyOwn(i);
-						int diff = alloc - ownedTickets - probablyOwnedTickets;
-						if (diff > 0) {
+						if (!agent.getQuote(i).isAuctionClosed()) {
+							int alloc = Math.max(agent.getAllocation(i), agent.getProbablyOwn(i));
 							float bidPrice = priceData.getPrice(Good.values()[i]);
 							Bid bid = new Bid(i);
-							bid.addBidPoint(diff, bidPrice + 50);
+							bid.addBidPoint(alloc, bidPrice + 50);
 							agent.submitBid(bid);
 						}
 					}
