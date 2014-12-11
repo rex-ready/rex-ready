@@ -12,6 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
 import com.googlecode.charts4j.AxisLabels;
 import com.googlecode.charts4j.AxisLabelsFactory;
 import com.googlecode.charts4j.AxisStyle;
@@ -26,6 +30,8 @@ import com.googlecode.charts4j.LineChart;
 import com.googlecode.charts4j.LinearGradientFill;
 import com.googlecode.charts4j.Plots;
 
+import rexready.gui.MarketplaceTableModel;
+import rexready.gui.StrategyTableModel;
 import se.sics.tac.aw.AgentImpl;
 import se.sics.tac.aw.Bid;
 import se.sics.tac.aw.Quote;
@@ -43,15 +49,24 @@ public class RexReady extends AgentImpl {
 	private Map<String, List<Float>> predictedMinimumFlightPrices = new HashMap<String, List<Float>>();
 	private Map<String, List<Float>> bidPrices = new HashMap<String, List<Float>>();
 	
+	private MarketplaceTableModel marketplaceTableModel = new MarketplaceTableModel();
+	private StrategyTableModel strategyTableModel = new StrategyTableModel();
+	
 	@Override
 	protected void init(ArgEnumerator args) {
-		System.out.println("init");
+		JFrame marketplaceWindow = new JFrame("Price data");
+		marketplaceWindow.setContentPane(new JScrollPane(new JTable(marketplaceTableModel)));
+		marketplaceWindow.pack();
+		marketplaceWindow.setVisible(true);
+		
+		JFrame strategyWindow = new JFrame("Current strategy");
+		strategyWindow.setContentPane(new JScrollPane(new JTable(strategyTableModel)));
+		strategyWindow.pack();
+		strategyWindow.setVisible(true);
 	}
 
 	@Override
 	public void gameStarted() {
-		System.out.println("gameStarted");
-		
 		optimiser = new Optimiser();
 		flightPredictor = new FlightPricePredictor();
 		hotelPredictor = new HotelPricePredictor();
@@ -91,8 +106,6 @@ public class RexReady extends AgentImpl {
 
 	@Override
 	public void gameStopped() {
-		System.out.println("gameStopped");
-		
 		try {
 			DateFormat dateFormat = new SimpleDateFormat("ddMMyyyyHHmmss");
 			Date date = new Date();
@@ -145,9 +158,6 @@ public class RexReady extends AgentImpl {
 	
 	@Override
 	public void quoteUpdated(Quote quote) {
-		System.out.println("quoteUpdated");
-		System.out.println(agent.getGameTime());
-		
 		int t = (int) Math.ceil(agent.getGameTime() / 10000.f);
 		
 		askPrices.get(TACAgent.getAuctionTypeAsString(quote.getAuction())).add(quote.getAskPrice());
@@ -195,11 +205,9 @@ public class RexReady extends AgentImpl {
 					priceData.setPrice(Good.values()[i], flightPredictor.getProbableMinimumPrice(i, (int) (agent.getGameTime() / 10000.f), agent.getQuote(i).getAskPrice()));
 					break;
 				case TACAgent.CAT_HOTEL:
-					System.out.println("Delta for hotel " + i + "=" + hotelPredictor.deltas[i - 8]);
 					priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice() + hotelPredictor.deltas[i - 8] * 2);
 					break;
 				case TACAgent.CAT_ENTERTAINMENT:
-					System.out.println("Delta for entertainment " + i + "=" + entertainmentPredictor.deltas[i - 16]);
 					priceData.setPrice(Good.values()[i], agent.getQuote(i).getAskPrice() + entertainmentPredictor.deltas[i - 16]);
 					if (agent.getQuote(i).getAskPrice() < 1.f) {
 						priceData.setAvailable(Good.values()[i], false);
@@ -207,9 +215,7 @@ public class RexReady extends AgentImpl {
 					break;
 				}
 			}
-			for (Good good : Good.values()) {
-				System.out.println("Predicted price of " + good.name() + " is " + priceData.getPrice(good));
-			}
+			marketplaceTableModel.setPriceData(priceData);
 			GoodsList ownedGoods = new GoodsList();
 			for (Good good : Good.values()) {
 				int amount = agent.getOwn(good.ordinal());
@@ -218,9 +224,8 @@ public class RexReady extends AgentImpl {
 				}
 				ownedGoods.setAmount(good, amount);
 			}
-			System.out.println("Running optimiser...");
 			Strategy strategy = optimiser.optimise(priceData, ownedGoods, 7000, 0.2f);
-			System.out.println(strategy);
+			strategyTableModel.update(strategy, priceData, ownedGoods);
 			float score = strategy.getScore(priceData, ownedGoods);
 			float totalCost = 0.f;
 			for (int i = 0; i < TACAgent.getAuctionNo(); ++i) {
@@ -230,9 +235,7 @@ public class RexReady extends AgentImpl {
 			agent.clearAllocation();
 			for (Good good : Good.values()) {
 				agent.setAllocation(good.ordinal(), strategy.getShoppingList().getAmount(good));
-				System.out.println("Allocating " + strategy.getShoppingList().getAmount(good) + " " + good.name() + "s");
 			}
-			System.out.println("Bid now");
 			
 			if (strategy.getScore(priceData, ownedGoods) < 500) {
 				System.out.println();
@@ -264,7 +267,6 @@ public class RexReady extends AgentImpl {
 						if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < threshold) {
 							if(diff > 0) {
 								float bidPrice = agent.getQuote(i).getAskPrice() + 50;
-								System.out.println("Bid on flight " + i + " for " + bidPrice);
 								Bid bid = new Bid(i);
 								bid.addBidPoint(diff, bidPrice);
 								agent.submitBid(bid);
@@ -283,12 +285,10 @@ public class RexReady extends AgentImpl {
 					Bid bid = new Bid(i);
 					if (agent.getGameTime() > 240000 && diff > 0) {
 						float bidPrice = Math.min(agent.getQuote(i).getAskPrice(), 200);
-						System.out.println("Bid on entertainment " + i + " for " + bidPrice);
 						bid.addBidPoint(diff, bidPrice);
 					}
 					if (agent.getGameTime() > 240000 && diff < 0) {
 						float sellPrice = Math.max(agent.getQuote(i).getAskPrice() - 10, 60);
-						System.out.println("Selling unneeded entertainment " + i + " for " + sellPrice);
 						bid.addBidPoint(diff, sellPrice);
 					}
 					agent.submitBid(bid);
@@ -296,7 +296,6 @@ public class RexReady extends AgentImpl {
 				// END ENTERTAINMENT BIDDING
 				
 				if (agent.getGameTime() % 60000 > 50000) {
-					System.out.println("Bid for hotels now");
 					for (int i = 8; i < 16; ++i) {
 						int alloc = agent.getAllocation(i);
 						int ownedTickets = agent.getOwn(i);
@@ -304,7 +303,6 @@ public class RexReady extends AgentImpl {
 						int diff = alloc - ownedTickets - probablyOwnedTickets;
 						if (diff > 0) {
 							float bidPrice = priceData.getPrice(Good.values()[i]);
-							System.out.println("Bid on hotel " + i + " for " + (bidPrice + 200));
 							Bid bid = new Bid(i);
 							bid.addBidPoint(diff, bidPrice + 50);
 							agent.submitBid(bid);
@@ -317,23 +315,20 @@ public class RexReady extends AgentImpl {
 
 	@Override
 	public void bidUpdated(Bid bid) {
-		System.out.println("bidUpdated: " + bid.getAuction() + " (" + bid.getProcessingStateAsString() + ")");
 	}
 
 	@Override
 	public void bidRejected(Bid bid) {
-		System.out.println("bidRejected: " + bid.getAuction() + " (" + bid.getRejectReasonAsString() + ")");
+		System.out.println("WARNING: Bid rejected: " + bid.getAuction() + " (" + bid.getRejectReasonAsString() + ")");
 	}
 
 	@Override
 	public void bidError(Bid bid, int error) {
-		System.out.println("bidError: " + bid.getAuction() + " (" + agent.commandStatusToString(error) + ")");
+		System.out.println("WARNING: Bid error: " + bid.getAuction() + " (" + agent.commandStatusToString(error) + ")");
 	}
 
 	@Override
 	public void auctionClosed(int auction) {
-		System.out.println("auctionClosed: " + auction);
-		System.out.println(agent.getGameTime());
 		if (TACAgent.getAuctionCategory(auction) == TACAgent.CAT_HOTEL) {
 			int hotelID = auction - 8;
 			hotelPredictor.closed[hotelID] = (int) Math.ceil(agent.getGameTime() / 10000.f);

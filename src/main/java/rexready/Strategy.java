@@ -1,5 +1,6 @@
 package rexready;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -27,6 +28,10 @@ public class Strategy {
 
 	public void setPackage(ClientPreferences client, Package pkg) {
 		packages.put(client, pkg);
+	}
+	
+	public Map<ClientPreferences, Package> getPackages() {
+		return Collections.unmodifiableMap(packages);
 	}
 	
 	public int getUtility() {
