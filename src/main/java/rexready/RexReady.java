@@ -237,15 +237,15 @@ public class RexReady extends AgentImpl {
 				agent.setAllocation(good.ordinal(), strategy.getShoppingList().getAmount(good));
 			}
 			
-			if (strategy.getScore(priceData, ownedGoods) < 500) {
+			if (!(strategy.getScore(priceData, ownedGoods) > 0)) {
 				System.out.println();
 				System.out.println();
-				System.out.println("***************************************");
-				System.out.println("***************************************");
-				System.out.println("*** WARNING: PROJECTED SCORE IS < 0 ***");
-				System.out.println("***   SKIPPING BIDDING FOR 1 TICK   ***");
-				System.out.println("***************************************");
-				System.out.println("***************************************");
+				System.out.println("************************************************");
+				System.out.println("************************************************");
+				System.out.println("*** WARNING: PROJECTED SCORE IS NOT POSITIVE ***");
+				System.out.println("***       SKIPPING BIDDING FOR 1 TICK        ***");
+				System.out.println("************************************************");
+				System.out.println("************************************************");
 				System.out.println();
 				System.out.println();
 			}
