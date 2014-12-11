@@ -105,7 +105,7 @@ public class RexReady extends AgentImpl {
 		// Place bids for 4 of every hotel room @ 6 each
 		for (int i = 8; i < 16; ++i) {
 			Bid bid = new Bid(i);
-			bid.addBidPoint(4, 6);
+			bid.addBidPoint(8, 10);
 			agent.submitBid(bid);
 		}
 	}
