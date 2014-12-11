@@ -52,6 +52,8 @@ public class RexReady extends AgentImpl {
 	private MarketplaceTableModel marketplaceTableModel = new MarketplaceTableModel();
 	private StrategyTableModel strategyTableModel = new StrategyTableModel();
 	
+	private float entertainmentUndercut;
+	
 	@Override
 	protected void init(ArgEnumerator args) {
 		JFrame marketplaceWindow = new JFrame("Price data");
@@ -67,6 +69,7 @@ public class RexReady extends AgentImpl {
 
 	@Override
 	public void gameStarted() {
+		entertainmentUndercut = 0.f;
 		optimiser = new Optimiser();
 		flightPredictor = new FlightPricePredictor();
 		hotelPredictor = new HotelPricePredictor();
@@ -290,6 +293,17 @@ public class RexReady extends AgentImpl {
 					if (agent.getGameTime() > 240000 && diff < 0) {
 						float sellPrice = Math.max(agent.getQuote(i).getAskPrice() - 10, 60);
 						bid.addBidPoint(diff, sellPrice);
+					}
+					if (alloc == 0 && ownedTickets == 0 && agent.getGameTime() < 240000) {
+						float maxPrice = 300.f;
+						if (agent.getQuote(i).getAskPrice() < (maxPrice - entertainmentUndercut) && (maxPrice - entertainmentUndercut) > 200) {
+							entertainmentUndercut += 10;
+							System.out.println("Someone undercut us on good " + i + ", changing sell price to " + (maxPrice - entertainmentUndercut));
+						}
+						float sellPrice = maxPrice - entertainmentUndercut;
+						if (sellPrice > 200) {
+							bid.addBidPoint(-1, sellPrice);
+						}
 					}
 					agent.submitBid(bid);
 				}
