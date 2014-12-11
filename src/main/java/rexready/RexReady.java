@@ -312,7 +312,7 @@ public class RexReady extends AgentImpl {
 							Bid bid = new Bid(i);
 							bid.addBidPoint(agent.getAllocation(i), bidPrice + 50);
 							if(agent.getAllocation(i) < agent.getProbablyOwn(i)) {
-								bid.addBidPoint(agent.getProbablyOwn(i) - agent.getAllocation(i), agent.getQuote(i).getAskPrice() + 1);
+								bid.addBidPoint(agent.getProbablyOwn(i) - agent.getAllocation(i), Math.max(agent.getQuote(i).getAskPrice() + 1, 10));
 							}
 							agent.submitBid(bid);
 						}
