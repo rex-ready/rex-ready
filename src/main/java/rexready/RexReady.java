@@ -108,6 +108,11 @@ public class RexReady extends AgentImpl {
 			bid.addBidPoint(8, 10);
 			agent.submitBid(bid);
 		}
+		for (int i = 16; i < TACAgent.getAuctionNo(); i++) {
+			Bid bid = new Bid(i);
+			bid.addBidPoint(1, 50);
+			agent.submitBid(bid);
+		}
 	}
 
 	@Override
