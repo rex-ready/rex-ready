@@ -310,9 +310,14 @@ public class RexReady extends AgentImpl {
 						if (!agent.getQuote(i).isAuctionClosed()) {
 							int alloc = Math.max(agent.getAllocation(i), agent.getProbablyOwn(i));
 							float bidPrice = priceData.getPrice(Good.values()[i]);
-							Bid bid = new Bid(i);
-							bid.addBidPoint(alloc, bidPrice + 50);
-							agent.submitBid(bid);
+							if(agent.getQuote(i).isAuctionClosed()) {
+								Bid bid = new Bid(i);
+								bid.addBidPoint(agent.getAllocation(i), bidPrice + 50);
+								if(agent.getAllocation(i) < agent.getProbablyOwn(i)) {
+									bid.addBidPoint(agent.getProbablyOwn(i) - agent.getAllocation(i), agent.getQuote(i).getAskPrice() + 1);
+								}
+								agent.submitBid(bid);
+							}
 						}
 					}
 				}
