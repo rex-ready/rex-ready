@@ -259,10 +259,6 @@ public class RexReady extends AgentImpl {
 			if (agent.getGameTime() > 30000 && strategy.getScore(priceData, ownedGoods) > 0) {
 				// FLIGHT BIDDING
 				if (agent.getGameTime() > 240000) {
-					float maxThreshold = 100.f;
-					float minThreshold = 30.f;
-					float threshold = minThreshold + ((agent.getGameTime() / (1.f * agent.getGameLength())) * (maxThreshold - minThreshold));
-					
 					for (int i = 0; i < 8; ++i) {
 						int alloc = agent.getAllocation(i);
 						int ownedTickets = agent.getOwn(i);
@@ -270,7 +266,7 @@ public class RexReady extends AgentImpl {
 						
 						int diff = alloc - ownedTickets - probablyOwnedTickets;
 						
-						if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < threshold) {
+						if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < 10 || agent.getGameTime() > 510000) {
 							if(diff > 0) {
 								float bidPrice = agent.getQuote(i).getAskPrice() + 50;
 								Bid bid = new Bid(i);
