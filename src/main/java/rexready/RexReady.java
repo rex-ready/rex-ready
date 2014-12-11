@@ -1,5 +1,6 @@
 package rexready;
 
+import java.awt.Dimension;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -58,11 +59,13 @@ public class RexReady extends AgentImpl {
 	protected void init(ArgEnumerator args) {
 		JFrame marketplaceWindow = new JFrame("Price data");
 		marketplaceWindow.setContentPane(new JScrollPane(new JTable(marketplaceTableModel)));
+		marketplaceWindow.setPreferredSize(new Dimension(200, 500));
 		marketplaceWindow.pack();
 		marketplaceWindow.setVisible(true);
 		
 		JFrame strategyWindow = new JFrame("Current strategy");
 		strategyWindow.setContentPane(new JScrollPane(new JTable(strategyTableModel)));
+		strategyWindow.setPreferredSize(new Dimension(1000, 200));
 		strategyWindow.pack();
 		strategyWindow.setVisible(true);
 	}
