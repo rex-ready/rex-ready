@@ -229,11 +229,7 @@ public class RexReady extends AgentImpl {
 			marketplaceTableModel.setPriceData(priceData);
 			GoodsList ownedGoods = new GoodsList();
 			for (Good good : Good.values()) {
-				int amount = agent.getOwn(good.ordinal());
-				if (!agent.getQuote(good.ordinal()).isAuctionClosed()) {
-					amount += agent.getProbablyOwn(good.ordinal());
-				}
-				ownedGoods.setAmount(good, amount);
+				ownedGoods.setAmount(good, agent.getOwn(good.ordinal()));
 			}
 			Strategy strategy = optimiser.optimise(priceData, ownedGoods, 7000, 0.2f);
 			strategyTableModel.update(strategy, priceData, ownedGoods);
