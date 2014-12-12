@@ -231,97 +231,99 @@ public class RexReady extends AgentImpl {
 			for (Good good : Good.values()) {
 				ownedGoods.setAmount(good, agent.getOwn(good.ordinal()));
 			}
-			Strategy strategy = optimiser.optimise(priceData, ownedGoods, 7000, 0.2f);
-			strategyTableModel.update(strategy, priceData, ownedGoods);
-			float score = strategy.getScore(priceData, ownedGoods);
-			float totalCost = 0.f;
-			for (int i = 0; i < TACAgent.getAuctionNo(); ++i) {
-				totalCost += agent.costs[i];
-			}
-			System.out.println("Projected score: " + score + " - " + totalCost + " = " + (score - totalCost));
-			agent.clearAllocation();
-			for (Good good : Good.values()) {
-				agent.setAllocation(good.ordinal(), strategy.getShoppingList().getAmount(good));
-			}
-			
-			if (!(strategy.getScore(priceData, ownedGoods) > 0)) {
-				System.out.println();
-				System.out.println();
-				System.out.println("************************************************");
-				System.out.println("************************************************");
-				System.out.println("*** WARNING: PROJECTED SCORE IS NOT POSITIVE ***");
-				System.out.println("***       SKIPPING BIDDING FOR 1 TICK        ***");
-				System.out.println("************************************************");
-				System.out.println("************************************************");
-				System.out.println();
-				System.out.println();
-			}
-			
-			if (agent.getGameTime() > 30000 && strategy.getScore(priceData, ownedGoods) > 0) {
-				// FLIGHT BIDDING
-				if (agent.getGameTime() > 240000) {
-					for (int i = 0; i < 8; ++i) {
+			if (agent.getGameTime() % 60000 > 5000) {
+				Strategy strategy = optimiser.optimise(priceData, ownedGoods, 7000, 0.2f);
+				strategyTableModel.update(strategy, priceData, ownedGoods);
+				float score = strategy.getScore(priceData, ownedGoods);
+				float totalCost = 0.f;
+				for (int i = 0; i < TACAgent.getAuctionNo(); ++i) {
+					totalCost += agent.costs[i];
+				}
+				System.out.println("Projected score: " + score + " - " + totalCost + " = " + (score - totalCost));
+				agent.clearAllocation();
+				for (Good good : Good.values()) {
+					agent.setAllocation(good.ordinal(), strategy.getShoppingList().getAmount(good));
+				}
+				
+				if (!(strategy.getScore(priceData, ownedGoods) > 0)) {
+					System.out.println();
+					System.out.println();
+					System.out.println("************************************************");
+					System.out.println("************************************************");
+					System.out.println("*** WARNING: PROJECTED SCORE IS NOT POSITIVE ***");
+					System.out.println("***       SKIPPING BIDDING FOR 1 TICK        ***");
+					System.out.println("************************************************");
+					System.out.println("************************************************");
+					System.out.println();
+					System.out.println();
+				}
+				
+				if (agent.getGameTime() > 30000 && strategy.getScore(priceData, ownedGoods) > 0) {
+					// FLIGHT BIDDING
+					if (agent.getGameTime() > 240000) {
+						for (int i = 0; i < 8; ++i) {
+							int alloc = agent.getAllocation(i);
+							int ownedTickets = agent.getOwn(i);
+							int probablyOwnedTickets = agent.getProbablyOwn(i);
+							
+							int diff = alloc - ownedTickets - probablyOwnedTickets;
+							
+							if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < 10 || agent.getGameTime() > 510000) {
+								if(diff > 0) {
+									float bidPrice = agent.getQuote(i).getAskPrice() + 50;
+									Bid bid = new Bid(i);
+									bid.addBidPoint(diff, bidPrice);
+									agent.submitBid(bid);
+								}
+							}
+						}
+					}
+					// END FLIGHT BIDDING
+					
+					// ENTERTAINMENT BIDDING
+					for (int i = 16; i < 28; ++i) {
 						int alloc = agent.getAllocation(i);
 						int ownedTickets = agent.getOwn(i);
-						int probablyOwnedTickets = agent.getProbablyOwn(i);
-						
-						int diff = alloc - ownedTickets - probablyOwnedTickets;
-						
-						if((agent.getQuote(i).getAskPrice()-priceData.getPrice(Good.values()[i])) < 10 || agent.getGameTime() > 510000) {
-							if(diff > 0) {
-								float bidPrice = agent.getQuote(i).getAskPrice() + 50;
+						int diff = alloc - ownedTickets;
+						Bid bid = new Bid(i);
+						if (agent.getGameTime() > 240000 && diff > 0) {
+							float bidPrice = Math.min(agent.getQuote(i).getAskPrice(), 200);
+							bid.addBidPoint(diff, bidPrice);
+						}
+						if (agent.getGameTime() > 240000 && diff < 0) {
+							float sellPrice = Math.max(agent.getQuote(i).getAskPrice() - 10, 60);
+							bid.addBidPoint(diff, sellPrice);
+						}
+						if (alloc == 0 && ownedTickets == 0 && agent.getGameTime() < 240000) {
+							float maxPrice = 300.f;
+							if (agent.getQuote(i).getAskPrice() < (maxPrice - entertainmentUndercut) && (maxPrice - entertainmentUndercut) > 200) {
+								entertainmentUndercut += 10;
+								System.out.println("Someone undercut us on good " + i + ", changing sell price to " + (maxPrice - entertainmentUndercut));
+							}
+							float sellPrice = maxPrice - entertainmentUndercut;
+							if (sellPrice > 200) {
+								bid.addBidPoint(-1, sellPrice);
+							}
+						}
+						agent.submitBid(bid);
+					}
+					// END ENTERTAINMENT BIDDING
+					//HOTEL BIDDING
+					if (agent.getGameTime() % 60000 > 50000) {
+						for (int i = 8; i < 16; ++i) {
+							if (!agent.getQuote(i).isAuctionClosed()) {
+								float bidPrice = priceData.getPrice(Good.values()[i]);
 								Bid bid = new Bid(i);
-								bid.addBidPoint(diff, bidPrice);
+								bid.addBidPoint(agent.getAllocation(i), bidPrice + 50);
+								if(agent.getAllocation(i) < agent.getProbablyOwn(i)) {
+									bid.addBidPoint(agent.getProbablyOwn(i) - agent.getAllocation(i), Math.max(agent.getQuote(i).getAskPrice() + 1, 10));
+								}
 								agent.submitBid(bid);
 							}
 						}
 					}
+					//END HOTEL BIDDING
 				}
-				// END FLIGHT BIDDING
-				
-				// ENTERTAINMENT BIDDING
-				for (int i = 16; i < 28; ++i) {
-					int alloc = agent.getAllocation(i);
-					int ownedTickets = agent.getOwn(i);
-					int diff = alloc - ownedTickets;
-					Bid bid = new Bid(i);
-					if (agent.getGameTime() > 240000 && diff > 0) {
-						float bidPrice = Math.min(agent.getQuote(i).getAskPrice(), 200);
-						bid.addBidPoint(diff, bidPrice);
-					}
-					if (agent.getGameTime() > 240000 && diff < 0) {
-						float sellPrice = Math.max(agent.getQuote(i).getAskPrice() - 10, 60);
-						bid.addBidPoint(diff, sellPrice);
-					}
-					if (alloc == 0 && ownedTickets == 0 && agent.getGameTime() < 240000) {
-						float maxPrice = 300.f;
-						if (agent.getQuote(i).getAskPrice() < (maxPrice - entertainmentUndercut) && (maxPrice - entertainmentUndercut) > 200) {
-							entertainmentUndercut += 10;
-							System.out.println("Someone undercut us on good " + i + ", changing sell price to " + (maxPrice - entertainmentUndercut));
-						}
-						float sellPrice = maxPrice - entertainmentUndercut;
-						if (sellPrice > 200) {
-							bid.addBidPoint(-1, sellPrice);
-						}
-					}
-					agent.submitBid(bid);
-				}
-				// END ENTERTAINMENT BIDDING
-				//HOTEL BIDDING
-				if (agent.getGameTime() % 60000 > 50000) {
-					for (int i = 8; i < 16; ++i) {
-						if (!agent.getQuote(i).isAuctionClosed()) {
-							float bidPrice = priceData.getPrice(Good.values()[i]);
-							Bid bid = new Bid(i);
-							bid.addBidPoint(agent.getAllocation(i), bidPrice + 50);
-							if(agent.getAllocation(i) < agent.getProbablyOwn(i)) {
-								bid.addBidPoint(agent.getProbablyOwn(i) - agent.getAllocation(i), Math.max(agent.getQuote(i).getAskPrice() + 1, 10));
-							}
-							agent.submitBid(bid);
-						}
-					}
-				}
-				//END HOTEL BIDDING
 			}
 		}
 	}
