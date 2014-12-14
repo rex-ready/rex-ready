@@ -1,4 +1,5 @@
 *.log
 *.lck
+/agent.conf
 /target/
 /data/
